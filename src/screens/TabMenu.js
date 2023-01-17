@@ -24,9 +24,8 @@ import {
 } from 'native-base';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import {TabView, SceneMap, TabBar} from 'react-native-tab-view';
-import MapsScreen from './Maps';
-import HistoryScreen from './History';
-import ProfileScreen from './Profile';
+import HomeScreen from './HomeScreen';
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
 const MyTab = ({...props}) => (
   <Box
@@ -42,7 +41,7 @@ const MyTab = ({...props}) => (
     }>
     <Center flex={1}></Center>
     <HStack
-      bg="#54b5df"
+      bg="#28a745"
       alignItems="center"
       safeAreaBottom
       shadow={6}
@@ -59,32 +58,12 @@ const MyTab = ({...props}) => (
         flex={1}>
         <Center>
           <Icon
-            name="motorcycle"
+            name="camera"
             size={22}
-            color={props.select === 0 ? 'white' : '#98d6f1'}
+            color={props.select === 0 ? 'white' : '#bbffcb'}
           />
-          <Text color={props.select === 0 ? 'white' : '#98d6f1'} fontSize="14">
-            Drivers
-          </Text>
-        </Center>
-      </Pressable>
-      <Pressable
-        // cursor="pointer"
-        // opacity={props.select === 1 ? 1 : 0.5}
-        onPress={() => {
-          props.taps(1);
-          props.jumpTo('History');
-        }}
-        py={2}
-        flex={1}>
-        <Center>
-          <Icon
-            name="list"
-            size={22}
-            color={props.select === 1 ? 'white' : '#98d6f1'}
-          />
-          <Text color={props.select === 1 ? 'white' : '#98d6f1'} fontSize="14">
-            History
+          <Text color={props.select === 0 ? 'white' : '#bbffcb'} fontSize="14">
+            Scan
           </Text>
         </Center>
       </Pressable>
@@ -117,9 +96,9 @@ const MyTab = ({...props}) => (
           <Icon
             name="user"
             size={22}
-            color={props.select === 2 ? 'white' : '#98d6f1'}
+            color={props.select === 2 ? 'white' : '#bbffcb'}
           />
-          <Text color={props.select === 2 ? 'white' : '#98d6f1'} fontSize="14">
+          <Text color={props.select === 2 ? 'white' : '#bbffcb'} fontSize="14">
             Profile
           </Text>
         </Center>
@@ -131,11 +110,11 @@ const MyTab = ({...props}) => (
 const renderScene = ({route}) => {
   switch (route.key) {
     case 'Maps':
-      return <MapsScreen />;
-    case 'History':
-      return <HistoryScreen />;
-    case 'Profile':
-      return <ProfileScreen />;
+      return <HomeScreen />;
+    // case 'History':
+    //   return <HistoryScreen />;
+    // case 'Profile':
+    //   return <ProfileScreen />;
     default:
       return null;
   }
@@ -181,7 +160,7 @@ export default function TabViewScreen({navigation}) {
   return (
     <NativeBaseProvider>
       <Box safeAreaTop backgroundColor="#54b5df" />
-      <HStack
+      {/* <HStack
         bg="#54b5df"
         px={3}
         py={4}
@@ -198,12 +177,8 @@ export default function TabViewScreen({navigation}) {
             TriSakay
           </Text>
         </HStack>
-        {/* <HStack space={2}>
-          <TouchableOpacity>
-            <Icon name="ellipsis-v" size={20} color="white" />
-          </TouchableOpacity>
-        </HStack> */}
-      </HStack>
+     
+      </HStack> */}
 
       <TabView
         renderTabBar={props => (
