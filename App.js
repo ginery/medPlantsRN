@@ -18,7 +18,7 @@ window.name = 'http://192.168.87.94/medplant/mobile/';
 
 export default function App() {
   React.useEffect(() => {
-    requestLocationPermission();
+    // requestLocationPermission();
   }, [1]);
   const requestLocationPermission = async () => {
     try {

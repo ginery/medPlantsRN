@@ -16,8 +16,6 @@ import {
   Icon,
   useToast,
   ScrollView,
-  Modal,
-  ActivityIndicator,
 } from 'native-base';
 import FontIcon from 'react-native-vector-icons/FontAwesome5';
 import {
@@ -25,6 +23,8 @@ import {
   Alert,
   ImageBackground,
   KeyboardAvoidingView,
+  Modal,
+  ActivityIndicator,
 } from 'react-native';
 import {useHeaderHeight} from '@react-navigation/elements';
 export default function Register({navigation}) {
@@ -50,7 +50,6 @@ export default function Register({navigation}) {
       password == '' ||
       contactNumber == ''
     ) {
-      setModalVisible(false);
       toast.show({
         render: () => {
           return (
@@ -62,6 +61,7 @@ export default function Register({navigation}) {
           );
         },
       });
+      setModalVisible(false);
     } else {
       const formData = new FormData();
       formData.append('fname', fname);
@@ -280,11 +280,11 @@ export default function Register({navigation}) {
                 <Button
                   disabled={buttonStatus}
                   mt="2"
+                  bgColor="#257f3a"
+                  bg="#28a745"
                   onPress={() => {
                     registerUser();
-                  }}
-                  bg="#28a745"
-                  bgColor="#257f3a">
+                  }}>
                   Sign up
                 </Button>
                 <HStack
@@ -320,33 +320,21 @@ export default function Register({navigation}) {
           </Center>
         </Center>
       </ScrollView>
-      <Box
-        p={2}
+
+      <Modal
         style={{
-          // borderColor: 'black',
-          // borderWidth: 1,
-          height: '91%',
-        }}>
-        <Modal
-          style={{
-            justifyContent: 'center',
-          }}
-          animationType="fade"
-          transparent={true}
-          visible={modalVisible}
-          onRequestClose={() => {
-            Alert.alert('Modal has been closed.');
-            setModalVisible(!modalVisible);
-          }}>
-          <Box
-            style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-            <Center bg="#2a2a2ab8" width="50%" height="20%" borderRadius={10}>
-              <ActivityIndicator size="large" color="white" />
-              <Text color="white">Loading...</Text>
-            </Center>
-          </Box>
-        </Modal>
-      </Box>
+          justifyContent: 'center',
+        }}
+        animationType="fade"
+        transparent={true}
+        visible={modalVisible}>
+        <Box style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+          <Center bg="#2a2a2ab8" width="50%" height="20%" borderRadius={10}>
+            <ActivityIndicator size="large" color="white" />
+            <Text color="white">Loading...</Text>
+          </Center>
+        </Box>
+      </Modal>
     </NativeBaseProvider>
   );
 }

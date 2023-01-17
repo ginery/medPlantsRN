@@ -24,7 +24,17 @@ import {View} from 'react-native';
 import {background, buttonStyle} from 'styled-system';
 import {TouchableOpacity, Alert, ImageBackground} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import {
+  BallIndicator,
+  BarIndicator,
+  DotIndicator,
+  MaterialIndicator,
+  PacmanIndicator,
+  PulseIndicator,
+  SkypeIndicator,
+  UIActivityIndicator,
+  WaveIndicator,
+} from 'react-native-indicators';
 export default function App({navigation, route}) {
   React.useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
@@ -74,9 +84,6 @@ export default function App({navigation, route}) {
         if (value.category == 'U') {
           console.log('user');
           navigation.navigate('Tab View');
-        } else if (value.category == 'R') {
-          console.log('rider');
-          navigation.navigate('Tab View Rider');
         }
       } else {
         console.log('login');
@@ -91,88 +98,91 @@ export default function App({navigation, route}) {
   };
   const login = () => {
     setButtonStatus(true);
-    // Alert.alert(username);
-    const formData = new FormData();
-    formData.append('username', username);
-    formData.append('password', password);
-    formData.append('idtoken', idtoken);
-    fetch(window.name + 'login.php', {
-      method: 'POST',
-      headers: {
-        Accept: 'applicatiion/json',
-        'Content-Type': 'multipart/form-data',
-      },
-      body: formData,
-    })
-      .then(response => response.json())
-      .then(responseJson => {
-        var data = responseJson.array_data[0];
-        if (data.response == 1) {
-          toast.show({
-            render: () => {
-              return (
-                <Box bg="emerald.500" px="2" py="1" rounded="sm" mb={5}>
-                  <Text color="white">Great! Please Wait.</Text>
-                </Box>
-              );
-            },
-          });
-          setItemStorage('user_details', {
-            user_id: data.user_id,
-            user_fname: data.user_fname,
-            // user_mname: data.user_mname,
-            user_lname: data.user_lname,
-            contact_number: data.contact_number,
-            username: data.username,
-            category: data.category,
-          });
-          setButtonStatus(true);
-          setTimeout(function () {
-            navigation.navigate('Tab View');
-          }, 1000);
-        } else if (data.response == 2) {
-          setItemStorage('user_details', {
-            user_id: data.user_id,
-            user_fname: data.user_fname,
-            // user_mname: data.user_mname,
-            user_lname: data.user_lname,
-            contact_number: data.contact_number,
-            username: data.username,
-            category: data.category,
-          });
-          setButtonStatus(true);
-          setTimeout(function () {
-            navigation.navigate('Tab View Driver');
-          }, 1000);
-        } else if (data.response == -1) {
-          toast.show({
-            render: () => {
-              return (
-                <Box bg="error.500" px="2" py="1" rounded="sm" mb={5}>
-                  <Text color="white">Sorry! Account doesn't exist.</Text>
-                </Box>
-              );
-            },
-          });
-        } else if (data.response == 0) {
-          toast.show({
-            render: () => {
-              return (
-                <Box bg="error.500" px="2" py="1" rounded="sm" mb={5}>
-                  <Text color="white">
-                    Aw snap! Something went wrong. Please try again
-                  </Text>
-                </Box>
-              );
-            },
-          });
-        }
-        console.log(data);
-      })
-      .catch(error => {
-        console.error(error);
-        //  Alert.alert('Internet Connection Error');
+    if (username == '' || password == '') {
+      toast.show({
+        render: () => {
+          return (
+            <Box bg="error.500" px="2" py="1" rounded="sm" mb={5}>
+              <Text color="white">Opps! Please fill out all text field.</Text>
+            </Box>
+          );
+        },
       });
+      setButtonStatus(false);
+    } else {
+      // Alert.alert(username);
+      const formData = new FormData();
+      formData.append('username', username);
+      formData.append('password', password);
+      // formData.append('idtoken', idtoken);
+      fetch(window.name + 'login.php', {
+        method: 'POST',
+        headers: {
+          Accept: 'applicatiion/json',
+          'Content-Type': 'multipart/form-data',
+        },
+        body: formData,
+      })
+        .then(response => response.json())
+        .then(responseJson => {
+          console.log(responseJson);
+          var data = responseJson.array_data[0];
+          if (data.response == 1) {
+            toast.show({
+              render: () => {
+                return (
+                  <Box bg="emerald.500" px="2" py="1" rounded="sm" mb={5}>
+                    <Text color="white">Great! Please Wait.</Text>
+                  </Box>
+                );
+              },
+            });
+            setItemStorage('user_details', {
+              user_id: data.user_id,
+              user_fname: data.user_fname,
+              // user_mname: data.user_mname,
+              user_lname: data.user_lname,
+              contact_number: data.contact_number,
+              username: data.username,
+              category: data.category,
+            });
+
+            setTimeout(function () {
+              navigation.navigate('Tab View');
+            }, 1000);
+          } else if (data.response == -1) {
+            toast.show({
+              render: () => {
+                return (
+                  <Box bg="error.500" px="2" py="1" rounded="sm" mb={5}>
+                    <Text color="white">Sorry! Account doesn't exist.</Text>
+                  </Box>
+                );
+              },
+            });
+            setButtonStatus(false);
+          } else if (data.response == 0) {
+            toast.show({
+              render: () => {
+                return (
+                  <Box bg="error.500" px="2" py="1" rounded="sm" mb={5}>
+                    <Text color="white">
+                      Aw snap! Something went wrong. Please try again
+                    </Text>
+                  </Box>
+                );
+              },
+            });
+            setButtonStatus(false);
+          }
+          // console.log(data);
+        })
+        .catch(error => {
+          console.error(error);
+          setButtonStatus(false);
+          //  Alert.alert('Internet Connection Error');
+        });
+    }
   };
   return (
     <NativeBaseProvider>
@@ -207,6 +217,8 @@ export default function App({navigation, route}) {
           <Input
             variant="outline"
             placeholder="Username"
+            value={username}
+            onChangeText={text => setUsername(text)}
             InputRightElement={
               <Icon
                 as={<FontIcon name="user" />}
@@ -221,6 +233,8 @@ export default function App({navigation, route}) {
             variant="outline"
             placeholder="password"
             type="password"
+            value={password}
+            onChangeText={text => setPassword(text)}
             InputRightElement={
               <Icon
                 as={<FontIcon name="lock" />}
@@ -234,16 +248,22 @@ export default function App({navigation, route}) {
           <Button
             disabled={buttonStatus}
             onPress={() => login()}
-            bgColor="#28a745"
+            bgColor="#257f3a"
+            bg="#28a745"
             _text={{color: 'white'}}
             //  endIcon={<Icon as={<FontIcon name="sign-in-alt" />} size="5" />}>
           >
             <HStack space={2} alignItems="center">
               {buttonStatus == true && (
-                <Spinner
-                  accessibilityLabel="Loading posts"
-                  size="sm"
+                // <Spinner
+                //   accessibilityLabel="Loading posts"
+                //   size="sm"
+                //   color="white"
+                // />
+                <UIActivityIndicator
                   color="white"
+                  size={20}
+                  style={{flex: 0}}
                 />
               )}
 

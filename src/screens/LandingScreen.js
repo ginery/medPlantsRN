@@ -2,6 +2,17 @@ import * as React from 'react';
 import {View, useWindowDimensions, Alert, TouchableOpacity} from 'react-native';
 import {NativeBaseProvider, Center, Spinner} from 'native-base';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {
+  BallIndicator,
+  BarIndicator,
+  DotIndicator,
+  MaterialIndicator,
+  PacmanIndicator,
+  PulseIndicator,
+  SkypeIndicator,
+  UIActivityIndicator,
+  WaveIndicator,
+} from 'react-native-indicators';
 // import {useNavigation} from '@react-navigation/native';
 export default function LandingScreen({navigation}) {
   // const navigation = useNavigation();
@@ -24,9 +35,6 @@ export default function LandingScreen({navigation}) {
         if (value.category == 'U') {
           console.log('user');
           navigation.navigate('Tab View');
-        } else if (value.category == 'D') {
-          console.log('driver');
-          navigation.navigate('Tab View Driver');
         }
       } else {
         console.log('login');
@@ -42,7 +50,8 @@ export default function LandingScreen({navigation}) {
   return (
     <NativeBaseProvider>
       <Center flex={1} px="3">
-        <Spinner accessibilityLabel="Loading posts" size="lg" color="#28a745" />
+        {/* <Spinner accessibilityLabel="Loading posts" size="lg" color="#28a745" /> */}
+        <DotIndicator color="#28a745" count={4} />
       </Center>
     </NativeBaseProvider>
   );
