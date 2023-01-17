@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1041385891211",
+    "project_id": "medplantsrn",
+    "storage_bucket": "medplantsrn.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1041385891211:android:8be4650ef9b83e565b7b8e",
+        "android_client_info": {
+          "package_name": "com.medplantsrn"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1041385891211-k1007loj2alknuie5dnn0aapnqdq7efe.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCeOB3FlR1SNZngJJOHe5QdE3sicA-XPAQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1041385891211-k1007loj2alknuie5dnn0aapnqdq7efe.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

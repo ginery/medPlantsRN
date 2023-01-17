@@ -1,112 +1,51 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- * @flow strict-local
- */
+import * as React from 'react';
+import {NavigationContainer} from '@react-navigation/native';
+import DrawerNavigator from './src/components/DrawerNavigation';
+import {NativeBaseProvider, Text} from 'native-base';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import React from 'react';
-import type {Node} from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
+import {navigationRef} from './src/components/RootNavigation';
+import * as RootNavigation from './src/components/RootNavigation';
+// import Geolocation from '@react-native-community/geolocation';
+import {PermissionsAndroid} from 'react-native';
+// Geolocation.getCurrentPosition(info => console.log(info));
+import Geolocation from 'react-native-geolocation-service';
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+// local connection
+window.name = 'http://192.168.87.94/medplant/mobile/';
+// online connection
+// window.name = 'https://trisakay.tech/mobile/';
 
-const Section = ({children, title}): Node => {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
-};
+export default function App() {
+  React.useEffect(() => {
+    requestLocationPermission();
+  }, [1]);
+  const requestLocationPermission = async () => {
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+        {
+          title: 'Location Permission',
+          message: 'MyMapApp needs access to your location',
+        },
+      );
 
-const App: () => Node = () => {
-  const isDarkMode = useColorScheme() === 'dark';
-
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        Geolocation.getCurrentPosition(info => console.log(info));
+        console.log('Location permission granted');
+      } else {
+        console.log('Location permission denied');
+      }
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.js</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+    <NativeBaseProvider>
+      <NavigationContainer ref={navigationRef}>
+        <DrawerNavigator />
+      </NavigationContainer>
+    </NativeBaseProvider>
   );
-};
-
-const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-});
-
-export default App;
+}

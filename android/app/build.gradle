@@ -1,5 +1,5 @@
 apply plugin: "com.android.application"
-
+apply plugin: 'com.google.gms.google-services'
 import com.android.build.OutputFile
 
 /**
@@ -82,7 +82,7 @@ project.ext.react = [
 ]
 
 apply from: "../../node_modules/react-native/react.gradle"
-
+apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"
 /**
  * Set this to true to create two separate APKs instead of one:
  *   - An APK that only works on ARM devices
@@ -260,9 +260,13 @@ dependencies {
 
     //noinspection GradleDynamicVersion
     implementation "com.facebook.react:react-native:+"  // From node_modules
-
+    implementation platform('com.google.firebase:firebase-bom:30.3.2')
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
-
+    implementation 'com.google.firebase:firebase-messaging'
+    implementation 'com.google.firebase:firebase-analytics:17.3.0'
+    implementation "com.google.android.gms:play-services-base:16.0.1"
+    implementation "com.google.android.gms:play-services-location:16.0.0"
+    implementation project(':react-native-push-notification')
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}") {
         exclude group:'com.facebook.fbjni'
     }
