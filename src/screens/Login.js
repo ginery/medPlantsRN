@@ -22,7 +22,12 @@ import {
 import FontIcon from 'react-native-vector-icons/AntDesign';
 import {View} from 'react-native';
 import {background, buttonStyle} from 'styled-system';
-import {TouchableOpacity, Alert, ImageBackground} from 'react-native';
+import {
+  TouchableOpacity,
+  Alert,
+  ImageBackground,
+  PermissionsAndroid,
+} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   BallIndicator,
@@ -63,10 +68,25 @@ export default function App({navigation, route}) {
   };
   const requestCameraPermission = async () => {
     try {
-      const cameraPermission = await Camera.requestCameraPermission();
-      // console.log(cameraPermission);
-    } catch (error) {
-      console.log(error);
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.CAMERA,
+        {
+          title: 'Cool Photo App Camera Permission',
+          message:
+            'Cool Photo App needs access to your camera ' +
+            'so you can take awesome pictures.',
+          buttonNeutral: 'Ask Me Later',
+          buttonNegative: 'Cancel',
+          buttonPositive: 'OK',
+        },
+      );
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        console.log('You can use the camera');
+      } else {
+        console.log('Camera permission denied');
+      }
+    } catch (err) {
+      console.warn(err);
     }
   };
   const retrieveData = async () => {
@@ -157,7 +177,7 @@ export default function App({navigation, route}) {
             });
 
             setTimeout(function () {
-              navigation.navigate('Tab View');
+              navigation.navigate('Landing');
             }, 1000);
           } else if (data.response == -1) {
             toast.show({
@@ -189,7 +209,7 @@ export default function App({navigation, route}) {
         .catch(error => {
           console.error(error);
           setButtonStatus(false);
-          //  Alert.alert('Internet Connection Error');
+          Alert.alert('Internet Connection Error');
         });
     }
   };
