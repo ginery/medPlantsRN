@@ -158,7 +158,7 @@ export default function HomeScreen() {
               onPress={() => {
                 photoCapture();
               }}>
-              capture
+              SCAN
             </Button>
           </Center>
         </Box>
