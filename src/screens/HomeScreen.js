@@ -5,7 +5,6 @@
 import React from 'react';
 import {
   SafeAreaView,
-  ScrollView,
   StatusBar,
   StyleSheet,
   useColorScheme,
@@ -15,9 +14,11 @@ import {
   Image,
   TouchableOpacity,
   ActivityIndicator,
+  Modal,
 } from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome5';
+import FontIcon from 'react-native-vector-icons/FontAwesome5';
 import {
+  ScrollView,
   Box,
   Heading,
   Avatar,
@@ -33,6 +34,10 @@ import {
   useDisclose,
   useToast,
   FlatList,
+  AspectRatio,
+  Stack,
+  Pressable,
+  Icon,
 } from 'native-base';
 import Rating from 'react-native-easy-rating';
 import {useNavigation} from '@react-navigation/native';
@@ -49,24 +54,30 @@ export default function HomeScreen() {
   const toast = useToast();
   const devices = useCameraDevices();
   const device = devices.back;
-
+  const [modalVisible, setModalVisible] = React.useState(false);
+  const [enableCamera, setEnableCamera] = React.useState(true);
+  const [modalPlantsDescription, setModalPlantsDescription] =
+    React.useState(false);
+  const [plantName, setPlantName] = React.useState('N/A');
+  const [plantAuthority, setPlantAuthority] = React.useState('N/A');
+  const [plantDesc, setPlantDesc] = React.useState('N/A');
+  const [plantPhoto, setPlantPhoto] = React.useState('');
+  const [taxonomyClass, setTaxonomyClass] = React.useState('N/A');
+  const [taxonomyFamily, setTaxonomyFamily] = React.useState('N/A');
+  const [taxonomyGenus, setTaxonomyGenus] = React.useState('N/A');
+  const [taxonomyKingdom, setTaxonomyKingdom] = React.useState('N/A');
+  const [taxonomyOrder, setTaxonomyOrder] = React.useState('N/A');
+  const [taxonomyPhylum, setTaxonomyPhylum] = React.useState('N/A');
   // const [capturePhoto, setCaputePhoto] = React.useState(false);
   console.log(device);
-  React.useEffect(() => {
-    requestCameraPermission();
-    // const device = devices.back;
-    // if (device == null) {
-    //   return <ActivityIndicator size={20} color={'red'} />;
-    // }
-  }, []);
-  const requestCameraPermission = async () => {
-    try {
-      const cameraPermission = await Camera.requestCameraPermission();
-      // console.log(cameraPermission);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  // React.useEffect(() => {
+  // requestCameraPermission();
+  // const device = devices.back;
+  // if (device == null) {
+  //   return <ActivityIndicator size={20} color={'red'} />;
+  // }
+  // }, []);
+
   const frameProcessor = useFrameProcessor(
     frame => {
       'worklet';
@@ -77,8 +88,9 @@ export default function HomeScreen() {
   );
   const photoCapture = async () => {
     try {
+      setModalVisible(true);
       const photo = await camera.current.takeSnapshot();
-      // console.log(photo.path);
+      console.log(photo.path);
       RNFS.readFile(photo.path, 'base64')
         .then(base64files => {
           const dataToScan = {
@@ -95,7 +107,7 @@ export default function HomeScreen() {
               'synonyms',
             ],
           };
-          console.log(photo.path);
+          // console.log(photo.path);
           fetch('https://api.plant.id/v2/identify', {
             method: 'POST',
             headers: {
@@ -105,7 +117,40 @@ export default function HomeScreen() {
           })
             .then(response => response.json())
             .then(data => {
-              console.log(data);
+              setModalVisible(false);
+              if (data.is_plant == true) {
+                setPlantName(data.suggestions[0].plant_name);
+                setPlantAuthority(
+                  data.suggestions[0].plant_details.name_authority,
+                );
+                setPlantDesc(
+                  data.suggestions[0].plant_details.wiki_description.value,
+                );
+                setTaxonomyClass(
+                  data.suggestions[0].plant_details.taxonomy.class,
+                );
+                setTaxonomyFamily(
+                  data.suggestions[0].plant_details.taxonomy.family,
+                );
+                setTaxonomyGenus(
+                  data.suggestions[0].plant_details.taxonomy.genus,
+                );
+                setTaxonomyKingdom(
+                  data.suggestions[0].plant_details.taxonomy.kingdom,
+                );
+                setTaxonomyOrder(
+                  data.suggestions[0].plant_details.taxonomy.order,
+                );
+                setTaxonomyPhylum(
+                  data.suggestions[0].plant_details.taxonomy.phylum,
+                );
+                setPlantPhoto(photo.path);
+                setModalPlantsDescription(true);
+              } else {
+                Alert.alert('It seems this is not a plant.');
+              }
+
+              console.log(data.suggestions[0]);
             });
         })
         .catch(err => {
@@ -129,7 +174,7 @@ export default function HomeScreen() {
             onPress={() => {
               navigation.openDrawer();
             }}>
-            <Icon name="bars" size={22} color="white" />
+            <FontIcon name="bars" size={22} color="white" />
           </TouchableOpacity>
           <Text color="white" fontSize={20} fontWeight="bold">
             MedPlants
@@ -153,16 +198,225 @@ export default function HomeScreen() {
               photo={true}
             />
           ) : null}
-          <Center>
+          <Center mt={10}>
             <Button
               onPress={() => {
                 photoCapture();
               }}>
-              SCAN
+              <HStack>
+                <Icon as={<FontIcon name="camera" />} size="5" color="white" />
+                <Text color="white" fontWeight="bold">
+                  {'  '}
+                  SCAN
+                </Text>
+              </HStack>
             </Button>
           </Center>
         </Box>
       </Center>
+      <Modal
+        style={{
+          justifyContent: 'center',
+        }}
+        animationType="fade"
+        transparent={true}
+        visible={modalVisible}>
+        <Box style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+          <Center bg="#2a2a2ab8" width="50%" height="20%" borderRadius={10}>
+            <ActivityIndicator size="large" color="white" />
+            <Text color="white">Scanning....</Text>
+          </Center>
+        </Box>
+      </Modal>
+      <Modal
+        style={{
+          justifyContent: 'center',
+        }}
+        animationType="fade"
+        transparent={true}
+        visible={modalPlantsDescription}>
+        <Box style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+          <Center bg="#2a2a2ab8" width="100%" height="100%">
+            <Center width="100%" height="50%" borderRadius={5}>
+              <Box alignItems="center" width="90%">
+                <Box alignItems="center">
+                  <Box
+                    maxW="80"
+                    rounded="lg"
+                    overflow="hidden"
+                    borderColor="coolGray.200"
+                    borderWidth="1"
+                    _dark={{
+                      borderColor: 'coolGray.600',
+                      backgroundColor: 'gray.700',
+                    }}
+                    _web={{
+                      shadow: 2,
+                      borderWidth: 0,
+                    }}
+                    _light={{
+                      backgroundColor: 'gray.50',
+                    }}>
+                    <Box>
+                      <AspectRatio w="100%" ratio={16 / 9}>
+                        <Image
+                          source={{
+                            uri: 'file://' + plantPhoto,
+                          }}
+                          alt="image"
+                        />
+                      </AspectRatio>
+                      <Pressable
+                        onPress={() => {
+                          setModalPlantsDescription(false);
+                        }}
+                        bgColor="#257f3a"
+                        bg="#28a745"
+                        _dark={{
+                          bg: '28a745',
+                        }}
+                        position="absolute"
+                        right="0"
+                        top="0"
+                        px="3"
+                        py="1.5">
+                        <Center
+                          _text={{
+                            color: 'warmGray.50',
+                            fontWeight: '700',
+                            fontSize: 'xs',
+                          }}>
+                          X
+                        </Center>
+                      </Pressable>
+                    </Box>
+                    <Stack p="4" space={0}>
+                      <Stack space={2}>
+                        <Heading size="md" ml="-1">
+                          {plantName}
+                        </Heading>
+                        <Text
+                          fontSize="xs"
+                          _light={{
+                            color: '#28a745',
+                          }}
+                          _dark={{
+                            color: '#28a745',
+                          }}
+                          fontWeight="500"
+                          ml="-0.5"
+                          mt="-1">
+                          {plantAuthority}
+                        </Text>
+                      </Stack>
+                      <Box
+                        style={{
+                          // borderColor: 'black',
+                          // borderWidth: 1,
+                          height: 150,
+                        }}>
+                        <ScrollView w={['100%', '300']}>
+                          <Text fontWeight="400">{plantDesc}</Text>
+                        </ScrollView>
+                      </Box>
+                      <HStack
+                        alignItems="center"
+                        space={1}
+                        justifyContent="space-between">
+                        <HStack alignItems="center">
+                          <Text
+                            color="coolGray.600"
+                            _dark={{
+                              color: 'warmGray.200',
+                            }}
+                            fontWeight="400">
+                            Taxonomy Class : {taxonomyClass}
+                          </Text>
+                        </HStack>
+                      </HStack>
+                      <HStack
+                        alignItems="center"
+                        space={1}
+                        justifyContent="space-between">
+                        <HStack alignItems="center">
+                          <Text
+                            color="coolGray.600"
+                            _dark={{
+                              color: 'warmGray.200',
+                            }}
+                            fontWeight="400">
+                            Taxonomy Family : {taxonomyFamily}
+                          </Text>
+                        </HStack>
+                      </HStack>
+                      <HStack
+                        alignItems="center"
+                        space={1}
+                        justifyContent="space-between">
+                        <HStack alignItems="center">
+                          <Text
+                            color="coolGray.600"
+                            _dark={{
+                              color: 'warmGray.200',
+                            }}
+                            fontWeight="400">
+                            Taxonomy Genus : {taxonomyGenus}
+                          </Text>
+                        </HStack>
+                      </HStack>
+                      <HStack
+                        alignItems="center"
+                        space={1}
+                        justifyContent="space-between">
+                        <HStack alignItems="center">
+                          <Text
+                            color="coolGray.600"
+                            _dark={{
+                              color: 'warmGray.200',
+                            }}
+                            fontWeight="400">
+                            Taxonomy Kingdom : {taxonomyKingdom}
+                          </Text>
+                        </HStack>
+                      </HStack>
+                      <HStack
+                        alignItems="center"
+                        space={1}
+                        justifyContent="space-between">
+                        <HStack alignItems="center">
+                          <Text
+                            color="coolGray.600"
+                            _dark={{
+                              color: 'warmGray.200',
+                            }}
+                            fontWeight="400">
+                            Taxonomy Order : {taxonomyOrder}
+                          </Text>
+                        </HStack>
+                      </HStack>
+                      <HStack
+                        alignItems="center"
+                        space={1}
+                        justifyContent="space-between">
+                        <HStack alignItems="center">
+                          <Text
+                            color="coolGray.600"
+                            _dark={{
+                              color: 'warmGray.200',
+                            }}
+                            fontWeight="400">
+                            Taxonomy Phylum : {taxonomyPhylum}
+                          </Text>
+                        </HStack>
+                      </HStack>
+                    </Stack>
+                  </Box>
+                </Box>
+              </Box>
+            </Center>
+          </Center>
+        </Box>
+      </Modal>
     </NativeBaseProvider>
   );
 }

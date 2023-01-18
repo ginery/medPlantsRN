@@ -58,48 +58,12 @@ const MyTab = ({...props}) => (
         flex={1}>
         <Center>
           <Icon
-            name="camera"
+            name="seedling"
             size={22}
             color={props.select === 0 ? 'white' : '#bbffcb'}
           />
           <Text color={props.select === 0 ? 'white' : '#bbffcb'} fontSize="14">
-            Scan
-          </Text>
-        </Center>
-      </Pressable>
-
-      <Pressable
-        // opacity={props.select === 2 ? 1 : 0.8}
-        color="red"
-        onPress={() => {
-          props.taps(2);
-          props.jumpTo('Profile');
-        }}
-        py={2}
-        flex={1}>
-        {/* {props.counter != 0 ? (
-          <Center
-            bg="#fd2e2e"
-            // border="white"
-            _text={{color: 'white', fontWeight: '700', fontSize: 'xs'}}
-            position="absolute"
-            right={8}
-            top={1}
-            h="5"
-            w="5"
-            p="0"
-            rounded="10">
-            {props.counter}
-          </Center>
-        ) : null} */}
-        <Center>
-          <Icon
-            name="user"
-            size={22}
-            color={props.select === 2 ? 'white' : '#bbffcb'}
-          />
-          <Text color={props.select === 2 ? 'white' : '#bbffcb'} fontSize="14">
-            Profile
+            Plants
           </Text>
         </Center>
       </Pressable>

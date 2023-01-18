@@ -39,6 +39,7 @@ export default function App({navigation, route}) {
   React.useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
       //console.log('refreshed_home');
+      requestCameraPermission();
       setButtonStatus(false);
       setUsername('');
       setPassword('');
@@ -58,6 +59,14 @@ export default function App({navigation, route}) {
       await AsyncStorage.setItem(key, JSON.stringify(value));
     } catch (error) {
       // Error saving data
+    }
+  };
+  const requestCameraPermission = async () => {
+    try {
+      const cameraPermission = await Camera.requestCameraPermission();
+      // console.log(cameraPermission);
+    } catch (error) {
+      console.log(error);
     }
   };
   const retrieveData = async () => {
