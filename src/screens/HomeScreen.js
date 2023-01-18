@@ -40,22 +40,78 @@ import {
   Camera,
   CameraPermissionStatus,
   useCameraDevices,
+  useFrameProcessor,
 } from 'react-native-vision-camera';
+import RNFS from 'react-native-fs';
 export default function HomeScreen() {
+  const camera = React.useRef(null);
   const navigation = useNavigation();
   const toast = useToast();
   const devices = useCameraDevices();
   const device = devices.back;
-  if (device == null) {
-    return <ActivityIndicator size={20} color={'red'} />;
-  }
+
+  // const [capturePhoto, setCaputePhoto] = React.useState(false);
+  console.log(device);
   React.useEffect(() => {
     requestCameraPermission();
+    // const device = devices.back;
+    // if (device == null) {
+    //   return <ActivityIndicator size={20} color={'red'} />;
+    // }
   }, []);
   const requestCameraPermission = async () => {
     try {
       const cameraPermission = await Camera.requestCameraPermission();
       // console.log(cameraPermission);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const frameProcessor = useFrameProcessor(
+    frame => {
+      'worklet';
+
+      console.log(frame);
+    },
+    [0.4],
+  );
+  const photoCapture = async () => {
+    try {
+      const photo = await camera.current.takeSnapshot();
+      // console.log(photo.path);
+      RNFS.readFile(photo.path, 'base64')
+        .then(base64files => {
+          const dataToScan = {
+            api_key: 'q10yUB5d4CeEX0HMvsSmGdjikogR7kX4oW8idHOfJeqWHy0mnW',
+            images: ['data:image/jpeg;base64,' + base64files],
+            modifiers: ['crops_fast', 'similar_images'],
+            plant_language: 'en',
+            plant_details: [
+              'common_names',
+              'url',
+              'name_authority',
+              'wiki_description',
+              'taxonomy',
+              'synonyms',
+            ],
+          };
+          console.log(photo.path);
+          fetch('https://api.plant.id/v2/identify', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(dataToScan),
+          })
+            .then(response => response.json())
+            .then(data => {
+              console.log(data);
+            });
+        })
+        .catch(err => {
+          console.log('read error');
+          console.log(err);
+        });
     } catch (error) {
       console.log(error);
     }
@@ -82,11 +138,29 @@ export default function HomeScreen() {
       </HStack>
       <Center flex={1} px="3" pt="3">
         <Box alignItems="center">
-          <Camera
-            style={{width: 100, height: 200}}
+          {/* <Camera
+            style={{width: 500, height: 200}}
             device={device}
             isActive={true}
-          />
+          /> */}
+          {device != null ? (
+            <Camera
+              ref={camera}
+              style={{width: 500, height: 400}}
+              device={device}
+              isActive={true}
+              // frameProcessor={frameProcessor}
+              photo={true}
+            />
+          ) : null}
+          <Center>
+            <Button
+              onPress={() => {
+                photoCapture();
+              }}>
+              capture
+            </Button>
+          </Center>
         </Box>
       </Center>
     </NativeBaseProvider>

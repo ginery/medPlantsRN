@@ -19,7 +19,7 @@ import {
   useToast,
   Box,
 } from 'native-base';
-import FontIcon from 'react-native-vector-icons/FontAwesome5';
+import FontIcon from 'react-native-vector-icons/AntDesign';
 import {View} from 'react-native';
 import {background, buttonStyle} from 'styled-system';
 import {TouchableOpacity, Alert, ImageBackground} from 'react-native';
@@ -211,7 +211,7 @@ export default function App({navigation, route}) {
           }}>
           <Center>
             <Text fontSize="lg" fontWeight="bold" color="#28a745">
-              Login To MedPlant
+              Login To MedPlants
             </Text>
           </Center>
           <Input
@@ -237,7 +237,7 @@ export default function App({navigation, route}) {
             onChangeText={text => setPassword(text)}
             InputRightElement={
               <Icon
-                as={<FontIcon name="lock" />}
+                as={<FontIcon name="lock1" />}
                 size={5}
                 mr={2}
                 color="#626262"
@@ -271,11 +271,7 @@ export default function App({navigation, route}) {
                 {buttonStatus ? 'Loading' : 'Sign In'}
               </Heading>
               {buttonStatus == false && (
-                <Icon
-                  as={<FontIcon name="sign-in-alt" />}
-                  size="5"
-                  color="white"
-                />
+                <Icon as={<FontIcon name="login" />} size="5" color="white" />
               )}
             </HStack>
           </Button>
