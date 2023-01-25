@@ -34,7 +34,7 @@ export default function LandingScreen({navigation}) {
         const value = JSON.parse(valueString);
         if (value.category == 'U') {
           console.log('user');
-          navigation.navigate('Tab View');
+          navigation.navigate('Home Screen');
         }
       } else {
         console.log('login');

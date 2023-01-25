@@ -11,9 +11,22 @@ import {
   NativeBaseProvider,
   Avatar,
 } from 'native-base';
+import {
+  SafeAreaView,
+  StatusBar,
+  StyleSheet,
+  useColorScheme,
+  View,
+  Alert,
+  RefreshControl,
+  TouchableOpacity,
+  ActivityIndicator,
+  Modal,
+} from 'react-native';
 import Rating from 'react-native-easy-rating';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-export default function Profile() {
+import FontIcon from 'react-native-vector-icons/FontAwesome5';
+export default function Profile({navigation}) {
   const [userFullName, setUserFullName] = React.useState('');
   const retrieveData = async () => {
     try {
@@ -36,6 +49,24 @@ export default function Profile() {
 
   return (
     <NativeBaseProvider>
+      <HStack
+        bg="#28a745"
+        px={3}
+        py={4}
+        justifyContent="space-between"
+        alignItems="center">
+        <HStack space={4} alignItems="center">
+          <TouchableOpacity
+            onPress={() => {
+              navigation.openDrawer();
+            }}>
+            <FontIcon name="bars" size={22} color="white" />
+          </TouchableOpacity>
+          <Text color="white" fontSize={20} fontWeight="bold">
+            MedPlants
+          </Text>
+        </HStack>
+      </HStack>
       <Center flex={1} px="3" pt="3">
         <Box alignItems="center">
           <Box

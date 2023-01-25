@@ -16,7 +16,6 @@ import {
   ActivityIndicator,
   Modal,
 } from 'react-native';
-import EntypoIcon from 'react-native-vector-icons/Entypo';
 import FontIcon from 'react-native-vector-icons/FontAwesome5';
 import {
   ScrollView,
@@ -40,9 +39,9 @@ import {
   Pressable,
   Icon,
 } from 'native-base';
+
 import Rating from 'react-native-easy-rating';
 import {useNavigation} from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   Camera,
   CameraPermissionStatus,
@@ -50,7 +49,7 @@ import {
   useFrameProcessor,
 } from 'react-native-vision-camera';
 import RNFS from 'react-native-fs';
-export default function HomeScreen() {
+export default function Screen() {
   const camera = React.useRef(null);
   const navigation = useNavigation();
   const toast = useToast();
@@ -70,24 +69,16 @@ export default function HomeScreen() {
   const [taxonomyKingdom, setTaxonomyKingdom] = React.useState('N/A');
   const [taxonomyOrder, setTaxonomyOrder] = React.useState('N/A');
   const [taxonomyPhylum, setTaxonomyPhylum] = React.useState('N/A');
-  const [user_fname, setUserFname] = React.useState('');
+  // const [capturePhoto, setCaputePhoto] = React.useState(false);
   console.log(device);
-  React.useEffect(() => {
-    retrieveData();
-  }, [user_fname]);
-  const retrieveData = async () => {
-    try {
-      const valueString = await AsyncStorage.getItem('user_details');
-      console.log(valueString);
-      console.log('home');
-      if (valueString != null) {
-        const value = JSON.parse(valueString);
-        setUserFname(value.user_fname + '!');
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  // React.useEffect(() => {
+  // requestCameraPermission();
+  // const device = devices.back;
+  // if (device == null) {
+  //   return <ActivityIndicator size={20} color={'red'} />;
+  // }
+  // }, []);
+
   const frameProcessor = useFrameProcessor(
     frame => {
       'worklet';
@@ -191,117 +182,37 @@ export default function HomeScreen() {
           </Text>
         </HStack>
       </HStack>
-      <Center></Center>
       <Center flex={1} px="3" pt="3">
-        <Box w="100%">
-          <HStack
-            space={[2, 3]}
-            justifyContent="space-between"
-            p={3}
-            bg="white">
-            <Image
-              style={{
-                // borderColor: 'black',
-                // borderWidth: 1,
-                width: 80,
-                height: 80,
-                resizeMode: 'stretch',
-              }}
-              source={require('../assets/images/logo2.png')}
-              alt="Alternate Text"
+        <Box alignItems="center">
+          {/* <Camera
+            style={{width: 500, height: 200}}
+            device={device}
+            isActive={true}
+          /> */}
+          {device != null ? (
+            <Camera
+              ref={camera}
+              style={{width: 500, height: 400}}
+              device={device}
+              isActive={true}
+              // frameProcessor={frameProcessor}
+              photo={true}
             />
-            <VStack>
-              <Text
-                _dark={{
-                  color: 'warmGray.50',
-                }}
-                color="coolGray.800">
-                Welcome Back
-              </Text>
-              <Text color="#257f3a" bold>
-                {user_fname}
-              </Text>
-              <Text
-                color="coolGray.600"
-                _dark={{
-                  color: 'warmGray.200',
-                }}>
-                MedPlants - Herbal Plants Information
-              </Text>
-            </VStack>
-            <Spacer />
-          </HStack>
-          <VStack space={3} alignItems="flex-start" mt={3}>
-            <Center w="100%" h="20" shadow={3}>
-              <HStack justifyContent="center" w="100%" h="100%">
-                <Center
-                  w="80%"
-                  bg="white"
-                  alignItems="flex-start"
-                  pl={3}
-                  borderBottomLeftRadius={10}
-                  borderTopLeftRadius={10}>
-                  <Text bold fontSize={20}>
-                    5
-                  </Text>
-                  <Text>Users</Text>
-                </Center>
-                <Center
-                  w="20%"
-                  bg="#334148"
-                  borderBottomRightRadius={10}
-                  borderTopRightRadius={10}>
-                  <EntypoIcon name="user" size={25} color="rgb(0, 236, 207)" />
-                </Center>
+          ) : null}
+          <Center mt={10}>
+            <Button
+              onPress={() => {
+                photoCapture();
+              }}>
+              <HStack>
+                <Icon as={<FontIcon name="camera" />} size="5" color="white" />
+                <Text color="white" fontWeight="bold">
+                  {'  '}
+                  SCAN
+                </Text>
               </HStack>
-            </Center>
-            <Center w="100%" h="20" shadow={3}>
-              <HStack justifyContent="center" w="100%" h="100%">
-                <Center
-                  w="80%"
-                  bg="white"
-                  alignItems="flex-start"
-                  pl={3}
-                  borderBottomLeftRadius={10}
-                  borderTopLeftRadius={10}>
-                  <Text bold fontSize={20}>
-                    4
-                  </Text>
-                  <Text>Total Plant</Text>
-                </Center>
-                <Center
-                  w="20%"
-                  bg="#334148"
-                  borderBottomRightRadius={10}
-                  borderTopRightRadius={10}>
-                  <FontIcon name="tree" size={25} color="rgb(255, 91, 91)" />
-                </Center>
-              </HStack>
-            </Center>
-            <Center w="100%" h="20" shadow={3}>
-              <HStack justifyContent="center" w="100%" h="100%">
-                <Center
-                  w="80%"
-                  bg="white"
-                  alignItems="flex-start"
-                  pl={3}
-                  borderBottomLeftRadius={10}
-                  borderTopLeftRadius={10}>
-                  <Text bold fontSize={20}>
-                    0
-                  </Text>
-                  <Text>Total Health Assessment</Text>
-                </Center>
-                <Center
-                  w="20%"
-                  bg="#334148"
-                  borderBottomRightRadius={10}
-                  borderTopRightRadius={10}>
-                  <FontIcon name="list" size={25} color="rgb(255, 235, 59)" />
-                </Center>
-              </HStack>
-            </Center>
-          </VStack>
+            </Button>
+          </Center>
         </Box>
       </Center>
       <Modal

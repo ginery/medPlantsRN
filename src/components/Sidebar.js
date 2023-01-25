@@ -76,21 +76,35 @@ export default function Sidebar({...props}) {
       </Box>
       <DrawerContentScrollView {...props}>
         <DrawerItemList {...props} />
-
-        {/* <DrawerItem
+        <DrawerItem
+          label="Health Assessment"
+          onPress={() => {
+            props.navigation.navigate('Plants');
+          }}
+          icon={() => <Icon name="list" size={22} color="#257f3a" />}
+        />
+        <DrawerItem
+          label="Plants"
+          onPress={() => {
+            props.navigation.navigate('Plants');
+          }}
+          icon={() => <Icon name="seedling" size={22} color="#257f3a" />}
+        />
+        <DrawerItem
           label="Profile"
           onPress={() => {
             props.navigation.navigate('Profile');
           }}
-          icon={() => <Icon name="user-alt" size={22} color="#98d6f1" />}
-        /> */}
+          // inactiveTintColor="#257f3a"
+          icon={() => <Icon name="user" size={22} color="#257f3a" />}
+        />
         <DrawerItem
           label="Sign Out"
           onPress={() => {
             AsyncStorage.clear();
             props.navigation.navigate('Landing');
           }}
-          icon={() => <Icon name="sign-out-alt" size={22} color="#98d6f1" />}
+          icon={() => <Icon name="sign-out-alt" size={22} color="#257f3a" />}
         />
       </DrawerContentScrollView>
     </>

@@ -5,7 +5,8 @@ import Login from '../screens/Login';
 import TabViewScreen from '../screens/TabMenu';
 import ProfileScreen from '../screens/Profile';
 import RegisterScreen from '../screens/Register';
-
+import HomeScreen from '../screens/HomeScreen';
+import PlantsScreen from '../screens/Plants';
 const Stack = createStackNavigator();
 const MainStackNavigator = () => {
   return (
@@ -31,8 +32,18 @@ const MainStackNavigator = () => {
         options={{headerShown: false}}
       />
       <Stack.Screen
+        name="Home Screen"
+        component={HomeScreen}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
         name="Register"
         component={RegisterScreen}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
+        name="Plants"
+        component={PlantsScreen}
         options={{headerShown: false}}
       />
     </Stack.Navigator>
