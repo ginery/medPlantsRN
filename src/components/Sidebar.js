@@ -79,7 +79,7 @@ export default function Sidebar({...props}) {
         <DrawerItem
           label="Health Assessment"
           onPress={() => {
-            props.navigation.navigate('Plants');
+            props.navigation.navigate('Health Assessment');
           }}
           icon={() => <Icon name="list" size={22} color="#257f3a" />}
         />

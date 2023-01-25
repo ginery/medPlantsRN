@@ -71,7 +71,7 @@ export default function HomeScreen() {
   const [taxonomyOrder, setTaxonomyOrder] = React.useState('N/A');
   const [taxonomyPhylum, setTaxonomyPhylum] = React.useState('N/A');
   const [user_fname, setUserFname] = React.useState('');
-  console.log(device);
+  // console.log(device);
   React.useEffect(() => {
     retrieveData();
   }, [user_fname]);

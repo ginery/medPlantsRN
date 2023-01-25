@@ -49,7 +49,7 @@ import {
   useFrameProcessor,
 } from 'react-native-vision-camera';
 import RNFS from 'react-native-fs';
-export default function Screen() {
+export default function HealthAssessmentScreen() {
   const camera = React.useRef(null);
   const navigation = useNavigation();
   const toast = useToast();
@@ -59,18 +59,15 @@ export default function Screen() {
   const [enableCamera, setEnableCamera] = React.useState(true);
   const [modalPlantsDescription, setModalPlantsDescription] =
     React.useState(false);
-  const [plantName, setPlantName] = React.useState('N/A');
-  const [plantAuthority, setPlantAuthority] = React.useState('N/A');
-  const [plantDesc, setPlantDesc] = React.useState('N/A');
-  const [plantPhoto, setPlantPhoto] = React.useState('');
-  const [taxonomyClass, setTaxonomyClass] = React.useState('N/A');
-  const [taxonomyFamily, setTaxonomyFamily] = React.useState('N/A');
-  const [taxonomyGenus, setTaxonomyGenus] = React.useState('N/A');
-  const [taxonomyKingdom, setTaxonomyKingdom] = React.useState('N/A');
-  const [taxonomyOrder, setTaxonomyOrder] = React.useState('N/A');
-  const [taxonomyPhylum, setTaxonomyPhylum] = React.useState('N/A');
+  const [assessmentName, setAssesstName] = React.useState('N/A');
+  const [assessmentCommonName, setCommonName] = React.useState('N/A');
+  const [assessmentDesc, setAssessmentDesc] = React.useState('N/A');
+  const [assessmentPhoto, setAssessmentPhoto] = React.useState('');
+  const [assessmentBiological, setAssessmentBiological] = React.useState('N/A');
+  const [assessmentPrevention, setAssessmentPrevention] = React.useState('N/A');
+
   // const [capturePhoto, setCaputePhoto] = React.useState(false);
-  console.log(device);
+  // console.log(device);
   // React.useEffect(() => {
   // requestCameraPermission();
   // const device = devices.back;
@@ -98,18 +95,18 @@ export default function Screen() {
             api_key: 'q10yUB5d4CeEX0HMvsSmGdjikogR7kX4oW8idHOfJeqWHy0mnW',
             images: ['data:image/jpeg;base64,' + base64files],
             modifiers: ['crops_fast', 'similar_images'],
-            plant_language: 'en',
-            plant_details: [
+            language: 'en',
+            disease_details: [
+              'cause',
               'common_names',
+              'classification',
+              'description',
+              'treatment',
               'url',
-              'name_authority',
-              'wiki_description',
-              'taxonomy',
-              'synonyms',
             ],
           };
           // console.log(photo.path);
-          fetch('https://api.plant.id/v2/identify', {
+          fetch('https://api.plant.id/v2/health_assessment', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -119,39 +116,31 @@ export default function Screen() {
             .then(response => response.json())
             .then(data => {
               setModalVisible(false);
-              if (data.is_plant == true) {
-                setPlantName(data.suggestions[0].plant_name);
-                setPlantAuthority(
-                  data.suggestions[0].plant_details.name_authority,
+              if (data.health_assessment.is_healthy == false) {
+                setAssesstName(data.health_assessment.diseases[0].name);
+                setAssessmentDesc(
+                  data.health_assessment.diseases[0].disease_details
+                    .description,
                 );
-                setPlantDesc(
-                  data.suggestions[0].plant_details.wiki_description.value,
+                setCommonName(
+                  data.health_assessment.diseases[0].disease_details
+                    .common_names,
                 );
-                setTaxonomyClass(
-                  data.suggestions[0].plant_details.taxonomy.class,
+                setAssessmentBiological(
+                  data.health_assessment.diseases[0].disease_details.treatment
+                    .biological,
                 );
-                setTaxonomyFamily(
-                  data.suggestions[0].plant_details.taxonomy.family,
+                setAssessmentPrevention(
+                  data.health_assessment.diseases[0].disease_details.treatment
+                    .prevention,
                 );
-                setTaxonomyGenus(
-                  data.suggestions[0].plant_details.taxonomy.genus,
-                );
-                setTaxonomyKingdom(
-                  data.suggestions[0].plant_details.taxonomy.kingdom,
-                );
-                setTaxonomyOrder(
-                  data.suggestions[0].plant_details.taxonomy.order,
-                );
-                setTaxonomyPhylum(
-                  data.suggestions[0].plant_details.taxonomy.phylum,
-                );
-                setPlantPhoto(photo.path);
+                setAssessmentPhoto(photo.path);
                 setModalPlantsDescription(true);
               } else {
-                Alert.alert('It seems this is not a plant.');
+                Alert.alert('This plant is health!.');
               }
 
-              console.log(data.suggestions[0]);
+              console.log(data.health_assessment.diseases[0].disease_details);
             });
         })
         .catch(err => {
@@ -182,7 +171,9 @@ export default function Screen() {
           </Text>
         </HStack>
       </HStack>
+
       <Center flex={1} px="3" pt="3">
+        <Heading>Health Assessment</Heading>
         <Box alignItems="center">
           {/* <Camera
             style={{width: 500, height: 200}}
@@ -262,7 +253,7 @@ export default function Screen() {
                       <AspectRatio w="100%" ratio={16 / 9}>
                         <Image
                           source={{
-                            uri: 'file://' + plantPhoto,
+                            uri: 'file://' + assessmentPhoto,
                           }}
                           alt="image"
                         />
@@ -294,7 +285,7 @@ export default function Screen() {
                     <Stack p="4" space={0}>
                       <Stack space={2}>
                         <Heading size="md" ml="-1">
-                          {plantName}
+                          {assessmentName}
                         </Heading>
                         <Text
                           fontSize="xs"
@@ -307,17 +298,23 @@ export default function Screen() {
                           fontWeight="500"
                           ml="-0.5"
                           mt="-1">
-                          {plantAuthority}
+                          {assessmentCommonName}
                         </Text>
                       </Stack>
                       <Box
                         style={{
                           // borderColor: 'black',
                           // borderWidth: 1,
-                          height: 150,
+                          height: 90,
                         }}>
-                        <ScrollView w={['100%', '300']}>
-                          <Text fontWeight="400">{plantDesc}</Text>
+                        <ScrollView
+                          w={['100%', '300']}
+                          style={{
+                            borderColor: 'black',
+                            borderBottomWidth: 1,
+                            borderStyle: 'dashed',
+                          }}>
+                          <Text fontWeight="400">{assessmentDesc}</Text>
                         </ScrollView>
                       </Box>
                       <HStack
@@ -325,90 +322,52 @@ export default function Screen() {
                         space={1}
                         justifyContent="space-between">
                         <HStack alignItems="center">
-                          <Text
-                            color="coolGray.600"
-                            _dark={{
-                              color: 'warmGray.200',
-                            }}
-                            fontWeight="400">
-                            Taxonomy Class : {taxonomyClass}
-                          </Text>
+                          <Box
+                            style={{
+                              // borderColor: 'black',
+                              // borderWidth: 1,
+                              height: 90,
+                            }}>
+                            <ScrollView
+                              w={['100%', '300']}
+                              style={{
+                                borderColor: 'black',
+                                borderBottomWidth: 1,
+                                borderStyle: 'dashed',
+                              }}>
+                              <Text
+                                color="coolGray.600"
+                                _dark={{
+                                  color: 'warmGray.200',
+                                }}
+                                fontWeight="400">
+                                Biological : {assessmentBiological}
+                              </Text>
+                            </ScrollView>
+                          </Box>
                         </HStack>
                       </HStack>
                       <HStack
                         alignItems="center"
                         space={1}
                         justifyContent="space-between">
-                        <HStack alignItems="center">
-                          <Text
-                            color="coolGray.600"
-                            _dark={{
-                              color: 'warmGray.200',
-                            }}
-                            fontWeight="400">
-                            Taxonomy Family : {taxonomyFamily}
-                          </Text>
-                        </HStack>
-                      </HStack>
-                      <HStack
-                        alignItems="center"
-                        space={1}
-                        justifyContent="space-between">
-                        <HStack alignItems="center">
-                          <Text
-                            color="coolGray.600"
-                            _dark={{
-                              color: 'warmGray.200',
-                            }}
-                            fontWeight="400">
-                            Taxonomy Genus : {taxonomyGenus}
-                          </Text>
-                        </HStack>
-                      </HStack>
-                      <HStack
-                        alignItems="center"
-                        space={1}
-                        justifyContent="space-between">
-                        <HStack alignItems="center">
-                          <Text
-                            color="coolGray.600"
-                            _dark={{
-                              color: 'warmGray.200',
-                            }}
-                            fontWeight="400">
-                            Taxonomy Kingdom : {taxonomyKingdom}
-                          </Text>
-                        </HStack>
-                      </HStack>
-                      <HStack
-                        alignItems="center"
-                        space={1}
-                        justifyContent="space-between">
-                        <HStack alignItems="center">
-                          <Text
-                            color="coolGray.600"
-                            _dark={{
-                              color: 'warmGray.200',
-                            }}
-                            fontWeight="400">
-                            Taxonomy Order : {taxonomyOrder}
-                          </Text>
-                        </HStack>
-                      </HStack>
-                      <HStack
-                        alignItems="center"
-                        space={1}
-                        justifyContent="space-between">
-                        <HStack alignItems="center">
-                          <Text
-                            color="coolGray.600"
-                            _dark={{
-                              color: 'warmGray.200',
-                            }}
-                            fontWeight="400">
-                            Taxonomy Phylum : {taxonomyPhylum}
-                          </Text>
-                        </HStack>
+                        <Box
+                          style={{
+                            // borderColor: 'black',
+                            // borderWidth: 1,
+                            height: 90,
+                          }}>
+                          <ScrollView w={['100%', '200']}>
+                            <Text
+                              color="coolGray.600"
+                              _dark={{
+                                color: 'warmGray.200',
+                              }}
+                              fontWeight="400">
+                              Prevention : {assessmentPrevention}
+                            </Text>
+                          </ScrollView>
+                        </Box>
                       </HStack>
                     </Stack>
                   </Box>

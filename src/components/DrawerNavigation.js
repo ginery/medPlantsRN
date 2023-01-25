@@ -18,13 +18,13 @@ const DrawerNavigation = props => {
         }}
         name="Home"
         component={MainStackNavigator}
-        options={{
+        options={({route, navigation}) => ({
           drawerIcon: config => <Icon name="home" size={22} color="white" />,
           headerShown: false,
           swipeEdgeWidth: 0,
           drawerActiveTintColor: 'white',
           drawerActiveBackgroundColor: '#257f3a',
-        }}
+        })}
       />
     </Drawer.Navigator>
   );
