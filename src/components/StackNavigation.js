@@ -8,6 +8,7 @@ import RegisterScreen from '../screens/Register';
 import HomeScreen from '../screens/HomeScreen';
 import PlantsScreen from '../screens/Plants';
 import HealthAssessmentScreen from '../screens/HealthAssessment';
+import HealthAssessmentListScreen from '../screens/HealthAssessmentList';
 const Stack = createStackNavigator();
 const MainStackNavigator = () => {
   return (
@@ -50,6 +51,11 @@ const MainStackNavigator = () => {
       <Stack.Screen
         name="Health Assessment"
         component={HealthAssessmentScreen}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
+        name="Health Assessment List"
+        component={HealthAssessmentListScreen}
         options={{headerShown: false}}
       />
     </Stack.Navigator>

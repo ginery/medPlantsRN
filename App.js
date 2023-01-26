@@ -12,9 +12,9 @@ import {PermissionsAndroid} from 'react-native';
 import Geolocation from 'react-native-geolocation-service';
 
 // local connection
-// window.name = 'http://192.168.87.94/medplant/mobile/';
+window.name = 'http://192.168.87.94/medplant/mobile/';
 // online connection
-window.name = 'https://juancoder.com/medplants/mobile/';
+// window.name = 'https://juancoder.com/medplants/mobile/';
 
 export default function App() {
   React.useEffect(() => {

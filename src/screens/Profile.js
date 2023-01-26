@@ -91,9 +91,9 @@ export default function Profile({navigation}) {
             <Box>
               <AspectRatio w="100%" ratio={16 / 9}>
                 <Image
-                  source={{
-                    uri: 'https://www.holidify.com/images/cmsuploads/compressed/Bangalore_citycover_20190613234056.jpg',
-                  }}
+                  width="100%"
+                  height="100%"
+                  source={require('../assets/images/medplants_cover.png')}
                   alt="image"
                 />
               </AspectRatio>
@@ -107,9 +107,7 @@ export default function Profile({navigation}) {
                   h="100"
                   alignSelf="center"
                   bg="amber.500"
-                  source={{
-                    uri: 'https://images.unsplash.com/photo-1607746882042-944635dfe10e?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80',
-                  }}>
+                  source={require('../assets/images/profile.jpg')}>
                   AK
                 </Avatar>
               </Center>
@@ -129,30 +127,8 @@ export default function Profile({navigation}) {
                   }}
                   fontWeight="500"
                   ml="-0.5"
-                  mt="-1">
-                  <Rating rating={4} max={5} iconWidth={24} iconHeight={24} />
-                </Text>
+                  mt="-1"></Text>
               </Stack>
-              <Text fontWeight="400">
-                Bengaluru (also called Bangalore) is the center of India's
-                high-tech industry. The city is also known for its parks and
-                nightlife.
-              </Text>
-              <HStack
-                alignItems="center"
-                space={4}
-                justifyContent="space-between">
-                <HStack alignItems="center">
-                  <Text
-                    color="coolGray.600"
-                    _dark={{
-                      color: 'warmGray.200',
-                    }}
-                    fontWeight="400">
-                    6 mins ago
-                  </Text>
-                </HStack>
-              </HStack>
             </Stack>
           </Box>
         </Box>

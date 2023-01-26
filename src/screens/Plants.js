@@ -41,7 +41,7 @@ import {
 } from 'native-base';
 
 import Rating from 'react-native-easy-rating';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useIsFocused} from '@react-navigation/native';
 import {
   Camera,
   CameraPermissionStatus,
@@ -50,6 +50,7 @@ import {
 } from 'react-native-vision-camera';
 import RNFS from 'react-native-fs';
 export default function PlantsScreen() {
+  const isFocused = useIsFocused();
   const camera = React.useRef(null);
   const navigation = useNavigation();
   const toast = useToast();
@@ -58,9 +59,12 @@ export default function PlantsScreen() {
   const [modalVisible, setModalVisible] = React.useState(false);
   const [modalPlantsDescription, setModalPlantsDescription] =
     React.useState(false);
+  const [enableCamera, setEnableCamera] = React.useState(false);
   const [plantName, setPlantName] = React.useState('N/A');
   const [plantAuthority, setPlantAuthority] = React.useState('N/A');
+  const [plantSynonyms, setPlantSynonyms] = React.useState('N/A');
   const [plantDesc, setPlantDesc] = React.useState('N/A');
+  const [photoBase64, setPhotoBase64] = React.useState('');
   const [plantPhoto, setPlantPhoto] = React.useState('');
   const [taxonomyClass, setTaxonomyClass] = React.useState('N/A');
   const [taxonomyFamily, setTaxonomyFamily] = React.useState('N/A');
@@ -68,14 +72,16 @@ export default function PlantsScreen() {
   const [taxonomyKingdom, setTaxonomyKingdom] = React.useState('N/A');
   const [taxonomyOrder, setTaxonomyOrder] = React.useState('N/A');
   const [taxonomyPhylum, setTaxonomyPhylum] = React.useState('N/A');
-  const frameProcessor = useFrameProcessor(
-    frame => {
-      'worklet';
+  const [plantScanId, setPlantScanId] = React.useState(0);
+  React.useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      //console.log('refreshed_home');
+      console.log(isFocused);
+      setEnableCamera(true);
+    });
 
-      console.log(frame);
-    },
-    [0.4],
-  );
+    return unsubscribe;
+  }, [navigation]);
   const photoCapture = async () => {
     try {
       setModalVisible(true);
@@ -83,8 +89,9 @@ export default function PlantsScreen() {
       console.log(photo.path);
       RNFS.readFile(photo.path, 'base64')
         .then(base64files => {
+          setPhotoBase64('data:image/jpeg;base64,' + base64files);
           const dataToScan = {
-            api_key: 'q10yUB5d4CeEX0HMvsSmGdjikogR7kX4oW8idHOfJeqWHy0mnW',
+            api_key: 'eqrx10kK3Oz53iDgiZytx1q71pr6Mk1hnbIZCFuZIECchVuW0D',
             images: ['data:image/jpeg;base64,' + base64files],
             modifiers: ['crops_fast', 'similar_images'],
             plant_language: 'en',
@@ -109,10 +116,12 @@ export default function PlantsScreen() {
             .then(data => {
               setModalVisible(false);
               if (data.is_plant == true) {
+                setPlantScanId(data.suggestions[0].id);
                 setPlantName(data.suggestions[0].plant_name);
                 setPlantAuthority(
                   data.suggestions[0].plant_details.name_authority,
                 );
+                setPlantSynonyms(data.suggestions[0].plant_details.synonyms);
                 setPlantDesc(
                   data.suggestions[0].plant_details.wiki_description.value,
                 );
@@ -151,6 +160,55 @@ export default function PlantsScreen() {
       console.log(error);
     }
   };
+  const savePlant = () => {
+    setModalVisible(true);
+    const formData = new FormData();
+    formData.append('plantScanId', plantScanId);
+    formData.append('plantName', plantName);
+    formData.append('plantSynonyms', plantSynonyms);
+    formData.append('plantAuthority', plantAuthority);
+    formData.append('plantDesc', plantDesc);
+    formData.append('taxonomyClass', taxonomyClass);
+    formData.append('taxonomyFamily', taxonomyFamily);
+    formData.append('taxonomyGenus', taxonomyGenus);
+    formData.append('taxonomyKingdom', taxonomyKingdom);
+    formData.append('taxonomyOrder', taxonomyOrder);
+    formData.append('taxonomyPhylum', taxonomyPhylum);
+    fetch(window.name + 'addPlant.php', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'multipart/form-data',
+      },
+      body: formData,
+    })
+      .then(response => response.json())
+      .then(responseJson => {
+        var data = responseJson.array_data[0];
+        console.log(data);
+        if (data.res == 1) {
+          setModalVisible(false);
+          setModalPlantsDescription(false);
+          toast.show({
+            render: () => {
+              return (
+                <Box bg="emerald.500" px="2" py="1" rounded="sm" mb={5}>
+                  <Text color="white">Great! Successfully added Plants.</Text>
+                </Box>
+              );
+            },
+          });
+        } else {
+          setModalVisible(false);
+          Alert.alert('Something went wrong.');
+        }
+      })
+      .catch(error => {
+        setModalVisible(false);
+        console.error(error);
+        Alert.alert('Internet Connection Error');
+      });
+  };
   return (
     <NativeBaseProvider>
       <HStack
@@ -172,6 +230,7 @@ export default function PlantsScreen() {
         </HStack>
       </HStack>
       <Center flex={1} px="3" pt="3">
+        <Heading>Plants</Heading>
         <Box alignItems="center">
           {/* <Camera
             style={{width: 500, height: 200}}
@@ -183,9 +242,9 @@ export default function PlantsScreen() {
               ref={camera}
               style={{width: 500, height: 400}}
               device={device}
-              isActive={true}
+              isActive={isFocused}
               // frameProcessor={frameProcessor}
-              photo={true}
+              photo={isFocused}
             />
           ) : null}
           <Center mt={10}>
@@ -298,6 +357,19 @@ export default function PlantsScreen() {
                           mt="-1">
                           {plantAuthority}
                         </Text>
+                        <Text
+                          fontSize="xs"
+                          _light={{
+                            color: '#28a745',
+                          }}
+                          _dark={{
+                            color: '#28a745',
+                          }}
+                          fontWeight="500"
+                          ml="-0.5"
+                          mt="-1">
+                          {plantSynonyms}
+                        </Text>
                       </Stack>
                       <Box
                         style={{
@@ -403,7 +475,9 @@ export default function PlantsScreen() {
                     <Button
                       bgColor="#257f3a"
                       bg="#28a745"
-                      onPress={() => console.log('hello world')}>
+                      onPress={() => {
+                        savePlant();
+                      }}>
                       Save Changes
                     </Button>
                   </Box>

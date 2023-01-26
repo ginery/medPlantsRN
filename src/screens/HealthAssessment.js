@@ -41,7 +41,7 @@ import {
 } from 'native-base';
 
 import Rating from 'react-native-easy-rating';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useIsFocused} from '@react-navigation/native';
 import {
   Camera,
   CameraPermissionStatus,
@@ -50,31 +50,34 @@ import {
 } from 'react-native-vision-camera';
 import RNFS from 'react-native-fs';
 export default function HealthAssessmentScreen() {
+  const isFocused = useIsFocused();
   const camera = React.useRef(null);
   const navigation = useNavigation();
   const toast = useToast();
   const devices = useCameraDevices();
   const device = devices.back;
   const [modalVisible, setModalVisible] = React.useState(false);
-  const [enableCamera, setEnableCamera] = React.useState(true);
+  const [enableCamera, setEnableCamera] = React.useState(false);
   const [modalPlantsDescription, setModalPlantsDescription] =
     React.useState(false);
+  const [assessmentScanId, setAssessmentScanId] = React.useState(0);
   const [assessmentName, setAssesstName] = React.useState('N/A');
   const [assessmentCommonName, setCommonName] = React.useState('N/A');
   const [assessmentDesc, setAssessmentDesc] = React.useState('N/A');
+  const [photoBase64, setPhotoBase64] = React.useState('');
   const [assessmentPhoto, setAssessmentPhoto] = React.useState('');
   const [assessmentBiological, setAssessmentBiological] = React.useState('N/A');
   const [assessmentPrevention, setAssessmentPrevention] = React.useState('N/A');
 
-  // const [capturePhoto, setCaputePhoto] = React.useState(false);
-  // console.log(device);
-  // React.useEffect(() => {
-  // requestCameraPermission();
-  // const device = devices.back;
-  // if (device == null) {
-  //   return <ActivityIndicator size={20} color={'red'} />;
-  // }
-  // }, []);
+  React.useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      //console.log('refreshed_home');
+      console.log(camera);
+      setEnableCamera(true);
+    });
+
+    return unsubscribe;
+  }, [navigation]);
 
   const frameProcessor = useFrameProcessor(
     frame => {
@@ -91,8 +94,9 @@ export default function HealthAssessmentScreen() {
       console.log(photo.path);
       RNFS.readFile(photo.path, 'base64')
         .then(base64files => {
+          setPhotoBase64('data:image/jpeg;base64,' + base64files);
           const dataToScan = {
-            api_key: 'q10yUB5d4CeEX0HMvsSmGdjikogR7kX4oW8idHOfJeqWHy0mnW',
+            api_key: 'eqrx10kK3Oz53iDgiZytx1q71pr6Mk1hnbIZCFuZIECchVuW0D',
             images: ['data:image/jpeg;base64,' + base64files],
             modifiers: ['crops_fast', 'similar_images'],
             language: 'en',
@@ -117,6 +121,7 @@ export default function HealthAssessmentScreen() {
             .then(data => {
               setModalVisible(false);
               if (data.health_assessment.is_healthy == false) {
+                setAssessmentScanId(data.id);
                 setAssesstName(data.health_assessment.diseases[0].name);
                 setAssessmentDesc(
                   data.health_assessment.diseases[0].disease_details
@@ -150,6 +155,53 @@ export default function HealthAssessmentScreen() {
     } catch (error) {
       console.log(error);
     }
+  };
+  const saveAssessment = () => {
+    setModalVisible(true);
+    const uriPart = assessmentPhoto.split('.');
+    const fileExtension = uriPart[uriPart.length - 1];
+    const formData = new FormData();
+    formData.append('assessmentScanId', assessmentScanId);
+    formData.append('assessmentName', assessmentName);
+    formData.append('assessmentCommonName', assessmentCommonName);
+    formData.append('assessmentDesc', assessmentDesc);
+    formData.append('assessmentPhoto', photoBase64);
+    formData.append('assessmentBiological', assessmentBiological);
+    formData.append('assessmentPrevention', assessmentPrevention);
+    fetch(window.name + 'addAssessment.php', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'multipart/form-data',
+      },
+      body: formData,
+    })
+      .then(response => response.json())
+      .then(responseJson => {
+        var data = responseJson.array_data[0];
+        console.log(data);
+        if (data.res == 1) {
+          setModalVisible(false);
+          setModalPlantsDescription(false);
+          toast.show({
+            render: () => {
+              return (
+                <Box bg="emerald.500" px="2" py="1" rounded="sm" mb={5}>
+                  <Text color="white">Great! Successfully added Plants.</Text>
+                </Box>
+              );
+            },
+          });
+        } else {
+          setModalVisible(false);
+          Alert.alert('Something went wrong.');
+        }
+      })
+      .catch(error => {
+        setModalVisible(false);
+        console.error(error);
+        Alert.alert('Internet Connection Error');
+      });
   };
   return (
     <NativeBaseProvider>
@@ -185,24 +237,43 @@ export default function HealthAssessmentScreen() {
               ref={camera}
               style={{width: 500, height: 400}}
               device={device}
-              isActive={true}
+              isActive={isFocused}
               // frameProcessor={frameProcessor}
-              photo={true}
+              photo={isFocused}
             />
           ) : null}
           <Center mt={10}>
-            <Button
-              onPress={() => {
-                photoCapture();
-              }}>
-              <HStack>
-                <Icon as={<FontIcon name="camera" />} size="5" color="white" />
-                <Text color="white" fontWeight="bold">
-                  {'  '}
-                  SCAN
-                </Text>
-              </HStack>
-            </Button>
+            <HStack>
+              <Button
+                onPress={() => {
+                  photoCapture();
+                }}>
+                <HStack>
+                  <Icon
+                    as={<FontIcon name="camera" />}
+                    size="5"
+                    color="white"
+                  />
+                  <Text color="white" fontWeight="bold">
+                    {'  '}
+                    SCAN
+                  </Text>
+                </HStack>
+              </Button>
+              <Button
+                ml="1"
+                onPress={() => {
+                  navigation.navigate('Health Assessment List');
+                }}>
+                <HStack>
+                  <Icon as={<FontIcon name="list" />} size="5" color="white" />
+                  <Text color="white" fontWeight="bold">
+                    {'  '}
+                    View List
+                  </Text>
+                </HStack>
+              </Button>
+            </HStack>
           </Center>
         </Box>
       </Center>
@@ -370,6 +441,14 @@ export default function HealthAssessmentScreen() {
                         </Box>
                       </HStack>
                     </Stack>
+                    <Button
+                      bgColor="#257f3a"
+                      bg="#28a745"
+                      onPress={() => {
+                        saveAssessment();
+                      }}>
+                      Save Changes
+                    </Button>
                   </Box>
                 </Box>
               </Box>
