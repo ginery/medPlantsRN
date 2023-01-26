@@ -50,9 +50,18 @@ import {
 } from 'react-native-vision-camera';
 import RNFS from 'react-native-fs';
 export default function HealthAssessmentListScreen({navigation}) {
+  React.useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      //console.log('refreshed_home');
+      getHealthAssessment();
+    });
+
+    return unsubscribe;
+  }, [navigation]);
   const [modalVisible, setModalVisible] = React.useState(false);
   const [modalPlantsDescription, setModalPlantsDescription] =
     React.useState(false);
+  const [assessmentData, setAssessmentData] = React.useState([]);
   const data = [
     {
       id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
@@ -94,6 +103,38 @@ export default function HealthAssessmentListScreen({navigation}) {
         'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRBwgu1A5zgPSvfE83nurkuzNEoXs9DMNr8Ww&usqp=CAU',
     },
   ];
+  const getHealthAssessment = () => {
+    // setModalVisible(true);
+
+    fetch(window.name + 'getAssessment.php', {
+      method: 'GET',
+      header: {
+        Accept: 'application/json',
+        'Content-Type': 'multipart/form-data',
+      },
+    })
+      .then(response => response.json())
+      .then(responseJson => {
+        // console.log(responseJson);
+        if (responseJson.array_data != '') {
+          var data = responseJson.array_data.map(function (item, index) {
+            return {
+              assessment_id: item.assessment_id,
+              assessment_name: item.assessment_name,
+              entity_id: item.entity_id,
+              assessment_common_name: item.assessment_common_name,
+              assessment_img: item.assessment_img,
+              date_added: item.date_added,
+            };
+          });
+          setAssessmentData(data);
+        }
+      })
+      .catch(error => {
+        console.error(error);
+        Alert.alert('Internet Connection Error');
+      });
+  };
   return (
     <NativeBaseProvider>
       <HStack
@@ -121,7 +162,7 @@ export default function HealthAssessmentListScreen({navigation}) {
           Inbox
         </Heading>
         <FlatList
-          data={data}
+          data={assessmentData}
           renderItem={({item}) => (
             <Box
               borderBottomWidth="1"
@@ -136,7 +177,7 @@ export default function HealthAssessmentListScreen({navigation}) {
                 <Avatar
                   size="48px"
                   source={{
-                    uri: item.avatarUrl,
+                    uri: global.global_image + item.assessment_img,
                   }}
                 />
                 <VStack>
@@ -146,14 +187,14 @@ export default function HealthAssessmentListScreen({navigation}) {
                     }}
                     color="coolGray.800"
                     bold>
-                    {item.fullName}
+                    {item.assessment_name}
                   </Text>
                   <Text
                     color="coolGray.600"
                     _dark={{
                       color: 'warmGray.200',
                     }}>
-                    {item.recentText}
+                    {item.assessment_common_name}
                   </Text>
                 </VStack>
                 <Spacer />
@@ -164,12 +205,12 @@ export default function HealthAssessmentListScreen({navigation}) {
                   }}
                   color="coolGray.800"
                   alignSelf="flex-start">
-                  {item.timeStamp}
+                  {item.date_added}
                 </Text>
               </HStack>
             </Box>
           )}
-          keyExtractor={item => item.id}
+          keyExtractor={item => item.assessment_id}
         />
       </Box>
 

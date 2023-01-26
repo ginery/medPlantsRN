@@ -15,6 +15,7 @@ import Geolocation from 'react-native-geolocation-service';
 window.name = 'http://192.168.87.94/medplant/mobile/';
 // online connection
 // window.name = 'https://juancoder.com/medplants/mobile/';
+global.global_image = 'http://192.168.87.94/medplant/vendors/assessment/';
 
 export default function App() {
   React.useEffect(() => {
