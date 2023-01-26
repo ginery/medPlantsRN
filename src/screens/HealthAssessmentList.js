@@ -158,9 +158,6 @@ export default function HealthAssessmentListScreen({navigation}) {
 
       <Heading p="3">Health Assessment List</Heading>
       <Box width="100%" p="3">
-        <Heading fontSize="xl" p="4" pb="3">
-          Inbox
-        </Heading>
         <FlatList
           data={assessmentData}
           renderItem={({item}) => (
