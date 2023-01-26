@@ -49,7 +49,7 @@ import {
   useFrameProcessor,
 } from 'react-native-vision-camera';
 import RNFS from 'react-native-fs';
-export default function PlantListScreen({navigation}) {
+export default function HealthAssessmentListScreen({navigation}) {
   React.useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
       //console.log('refreshed_home');
@@ -156,7 +156,7 @@ export default function PlantListScreen({navigation}) {
         </HStack>
       </HStack>
 
-      <Heading p="3">Health Assessment List</Heading>
+      <Heading p="3">Plant List</Heading>
       <Box width="100%" p="3">
         <FlatList
           data={assessmentData}

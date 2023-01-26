@@ -248,18 +248,37 @@ export default function PlantsScreen() {
             />
           ) : null}
           <Center mt={10}>
-            <Button
-              onPress={() => {
-                photoCapture();
-              }}>
-              <HStack>
-                <Icon as={<FontIcon name="camera" />} size="5" color="white" />
-                <Text color="white" fontWeight="bold">
-                  {'  '}
-                  SCAN
-                </Text>
-              </HStack>
-            </Button>
+            <HStack>
+              <Button
+                onPress={() => {
+                  photoCapture();
+                }}>
+                <HStack>
+                  <Icon
+                    as={<FontIcon name="camera" />}
+                    size="5"
+                    color="white"
+                  />
+                  <Text color="white" fontWeight="bold">
+                    {'  '}
+                    SCAN
+                  </Text>
+                </HStack>
+              </Button>
+              <Button
+                ml="1"
+                onPress={() => {
+                  navigation.navigate('Plant List');
+                }}>
+                <HStack>
+                  <Icon as={<FontIcon name="list" />} size="5" color="white" />
+                  <Text color="white" fontWeight="bold">
+                    {'  '}
+                    View List
+                  </Text>
+                </HStack>
+              </Button>
+            </HStack>
           </Center>
         </Box>
       </Center>
