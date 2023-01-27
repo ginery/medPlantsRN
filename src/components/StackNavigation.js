@@ -8,8 +8,8 @@ import RegisterScreen from '../screens/Register';
 import HomeScreen from '../screens/HomeScreen';
 import PlantsScreen from '../screens/Plants';
 import HealthAssessmentScreen from '../screens/HealthAssessment';
-import HealthAssessmentListScreen from '../screens/PlantsList';
-import PlantListScreen from '../screens/HealthAssessmentList';
+import HealthAssessmentListScreen from '../screens/HealthAssessmentList';
+import PlantListScreen from '../screens/PlantsList';
 const Stack = createStackNavigator();
 const MainStackNavigator = () => {
   return (

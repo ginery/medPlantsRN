@@ -49,7 +49,7 @@ import {
   useFrameProcessor,
 } from 'react-native-vision-camera';
 import RNFS from 'react-native-fs';
-export default function HealthAssessmentListScreen({navigation}) {
+export default function PlantListScreen({navigation}) {
   React.useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
       //console.log('refreshed_home');
@@ -174,7 +174,7 @@ export default function HealthAssessmentListScreen({navigation}) {
                 <Avatar
                   size="48px"
                   source={{
-                    uri: global.global_image + item.assessment_img,
+                    uri: global.global_image + 'file/' + item.assessment_img,
                   }}
                 />
                 <VStack>

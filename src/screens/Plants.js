@@ -168,6 +168,7 @@ export default function PlantsScreen() {
     formData.append('plantSynonyms', plantSynonyms);
     formData.append('plantAuthority', plantAuthority);
     formData.append('plantDesc', plantDesc);
+    formData.append('plantPhoto', photoBase64);
     formData.append('taxonomyClass', taxonomyClass);
     formData.append('taxonomyFamily', taxonomyFamily);
     formData.append('taxonomyGenus', taxonomyGenus);
