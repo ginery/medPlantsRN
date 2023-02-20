@@ -71,9 +71,13 @@ export default function HomeScreen() {
   const [taxonomyOrder, setTaxonomyOrder] = React.useState('N/A');
   const [taxonomyPhylum, setTaxonomyPhylum] = React.useState('N/A');
   const [user_fname, setUserFname] = React.useState('');
+  const [countPlant, setCountPlant] = React.useState(0);
+  const [countUser, setCountUser] = React.useState(0);
+  const [countAssessment, setCountAssessment] = React.useState(0);
   // console.log(device);
   React.useEffect(() => {
     retrieveData();
+    countPlantUserHealth();
   }, [user_fname]);
   const retrieveData = async () => {
     try {
@@ -96,80 +100,29 @@ export default function HomeScreen() {
     },
     [0.4],
   );
-  const photoCapture = async () => {
-    try {
-      setModalVisible(true);
-      const photo = await camera.current.takeSnapshot();
-      console.log(photo.path);
-      RNFS.readFile(photo.path, 'base64')
-        .then(base64files => {
-          const dataToScan = {
-            api_key: 'q10yUB5d4CeEX0HMvsSmGdjikogR7kX4oW8idHOfJeqWHy0mnW',
-            images: ['data:image/jpeg;base64,' + base64files],
-            modifiers: ['crops_fast', 'similar_images'],
-            plant_language: 'en',
-            plant_details: [
-              'common_names',
-              'url',
-              'name_authority',
-              'wiki_description',
-              'taxonomy',
-              'synonyms',
-            ],
-          };
-          // console.log(photo.path);
-          fetch('https://api.plant.id/v2/identify', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(dataToScan),
-          })
-            .then(response => response.json())
-            .then(data => {
-              setModalVisible(false);
-              if (data.is_plant == true) {
-                setPlantName(data.suggestions[0].plant_name);
-                setPlantAuthority(
-                  data.suggestions[0].plant_details.name_authority,
-                );
-                setPlantDesc(
-                  data.suggestions[0].plant_details.wiki_description.value,
-                );
-                setTaxonomyClass(
-                  data.suggestions[0].plant_details.taxonomy.class,
-                );
-                setTaxonomyFamily(
-                  data.suggestions[0].plant_details.taxonomy.family,
-                );
-                setTaxonomyGenus(
-                  data.suggestions[0].plant_details.taxonomy.genus,
-                );
-                setTaxonomyKingdom(
-                  data.suggestions[0].plant_details.taxonomy.kingdom,
-                );
-                setTaxonomyOrder(
-                  data.suggestions[0].plant_details.taxonomy.order,
-                );
-                setTaxonomyPhylum(
-                  data.suggestions[0].plant_details.taxonomy.phylum,
-                );
-                setPlantPhoto(photo.path);
-                setModalPlantsDescription(true);
-              } else {
-                Alert.alert('It seems this is not a plant.');
-              }
-
-              console.log(data.suggestions[0]);
-            });
-        })
-        .catch(err => {
-          console.log('read error');
-          console.log(err);
-        });
-    } catch (error) {
-      console.log(error);
-    }
+  const countPlantUserHealth = () => {
+    fetch(window.name + 'countPlantUserHealth.php', {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'multipart/form-data',
+      },
+    })
+      .then(response => response.json())
+      .then(responseJson => {
+        console.log(responseJson);
+        if (responseJson.array_data != '') {
+          setCountPlant(responseJson.array_data[0].count_plants);
+          setCountUser(responseJson.array_data[0].count_users);
+          setCountAssessment(responseJson.array_data[0].count_assessment);
+        }
+        // console.log(data);
+      })
+      .catch(error => {
+        console.error(error);
+        setButtonStatus(false);
+        Alert.alert('Internet Connection Error');
+      });
   };
   return (
     <NativeBaseProvider>
@@ -242,7 +195,7 @@ export default function HomeScreen() {
                   borderBottomLeftRadius={10}
                   borderTopLeftRadius={10}>
                   <Text bold fontSize={20}>
-                    5
+                    {countUser}
                   </Text>
                   <Text>Users</Text>
                 </Center>
@@ -265,7 +218,7 @@ export default function HomeScreen() {
                   borderBottomLeftRadius={10}
                   borderTopLeftRadius={10}>
                   <Text bold fontSize={20}>
-                    4
+                    {countPlant}
                   </Text>
                   <Text>Total Plant</Text>
                 </Center>
@@ -288,7 +241,7 @@ export default function HomeScreen() {
                   borderBottomLeftRadius={10}
                   borderTopLeftRadius={10}>
                   <Text bold fontSize={20}>
-                    0
+                    {countAssessment}
                   </Text>
                   <Text>Total Health Assessment</Text>
                 </Center>
