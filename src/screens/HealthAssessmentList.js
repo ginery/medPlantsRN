@@ -11,7 +11,6 @@ import {
   View,
   Alert,
   RefreshControl,
-  Image,
   TouchableOpacity,
   ActivityIndicator,
   Modal,
@@ -38,6 +37,7 @@ import {
   Stack,
   Pressable,
   Icon,
+  Image,
 } from 'native-base';
 
 import Rating from 'react-native-easy-rating';
@@ -117,21 +117,27 @@ export default function HealthAssesmentScreen({navigation}) {
       </HStack>
 
       <Heading p="3">Health Assessment List</Heading>
-      <Box width="100%" p="3">
+      <Box p="3" h="85%" w="100%">
         <FlatList
+          h="100%"
+          w="100%"
           data={assessmentData}
           renderItem={({item}) => (
             <Box
-              borderBottomWidth="1"
+              bg="white"
+              shadow={1}
+              borderRadius={5}
+              mb={1}
+              borderWidth="1"
               _dark={{
-                borderColor: 'muted.50',
+                borderColor: '#28a745',
               }}
-              borderColor="muted.800"
+              borderColor="#28a745"
               pl={['0', '4']}
               pr={['0', '5']}
               py="2">
-              <HStack space={[2, 3]} justifyContent="space-between">
-                <Avatar
+              <HStack space={[2, 3]} justifyContent="space-between" p={1}>
+                <Image
                   size="48px"
                   source={{
                     uri:
