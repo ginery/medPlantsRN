@@ -199,6 +199,18 @@ export default function PlantsScreen() {
               );
             },
           });
+        } else if (data.res == 2) {
+          setModalVisible(false);
+          // setModalPlantsDescription(false);
+          toast.show({
+            render: () => {
+              return (
+                <Box bg="warning.500" px="2" py="1" rounded="sm" mb={5}>
+                  <Text color="white">Plant already exist.</Text>
+                </Box>
+              );
+            },
+          });
         } else {
           setModalVisible(false);
           Alert.alert('Something went wrong.');
