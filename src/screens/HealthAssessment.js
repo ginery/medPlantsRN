@@ -39,6 +39,7 @@ import {
   Pressable,
   Icon,
   TextArea,
+  Input,
 } from 'native-base';
 
 import Rating from 'react-native-easy-rating';
@@ -90,6 +91,7 @@ export default function HealthAssessmentScreen() {
     [0.4],
   );
   function scanAssessmentID(entity_id) {
+    console.log(entity_id);
     const formData = new FormData();
     formData.append('entity_id', entity_id);
     fetch(window.name + 'scanAssessment.php', {
@@ -107,7 +109,7 @@ export default function HealthAssessmentScreen() {
         if (responseJson.array_data != '') {
           setAssessmentScanId(data.entity_id);
           setAssesstName(data.assessment_name);
-          setAssessmentDesc(dataassessment_description);
+          setAssessmentDesc(data.assessment_description);
           setCommonName(data.assessment_common_name);
           setAssessmentBiological(data.assessment_biological);
           setAssessmentPrevention(data.assessment_prevention);
@@ -155,8 +157,8 @@ export default function HealthAssessmentScreen() {
             .then(response => response.json())
             .then(data => {
               setModalVisible(false);
+              scanAssessmentID(data.id);
               if (data.health_assessment.is_healthy == false) {
-                scanAssessmentID(data.id);
                 if (assessmentExist == false) {
                   setAssessmentScanId(data.id);
                   setAssesstName(data.health_assessment.diseases[0].name);
@@ -166,18 +168,21 @@ export default function HealthAssessmentScreen() {
                   );
                   setCommonName(
                     data.health_assessment.diseases[0].disease_details
-                      .common_names,
+                      .common_names[0],
                   );
                   setAssessmentBiological(
                     data.health_assessment.diseases[0].disease_details.treatment
-                      .biological,
+                      .biological[0],
                   );
                   setAssessmentPrevention(
                     data.health_assessment.diseases[0].disease_details.treatment
-                      .prevention,
+                      .prevention[0],
                   );
                 }
-
+                // console.log(
+                //   data.health_assessment.diseases[0].disease_details.treatment
+                //     .biological,
+                // );
                 setAssessmentPhoto(photo.path);
                 setModalPlantsDescription(true);
               } else {
@@ -220,7 +225,7 @@ export default function HealthAssessmentScreen() {
       .then(response => response.json())
       .then(responseJson => {
         var data = responseJson.array_data[0];
-        console.log(data);
+        // console.log(data);
         if (data.res == 1) {
           setModalVisible(false);
           setModalPlantsDescription(false);
@@ -281,7 +286,7 @@ export default function HealthAssessmentScreen() {
       .then(response => response.json())
       .then(responseJson => {
         var data = responseJson.array_data[0];
-        console.log(data);
+        // console.log(data);
         if (data.res == 1) {
           setModalVisible(false);
           setModalPlantsDescription(false);
@@ -485,27 +490,33 @@ export default function HealthAssessmentScreen() {
                         borderStyle: 'dashed',
                       }}>
                       <Stack p="4" space={0} width="100%">
-                        <Stack
-                          width="100%"
-                          space={2}
-                          borderBottomWidth={1}
-                          borderColor="#28a745">
-                          <Heading size="md" ml="-1">
+                        <Stack width="100%" space={2}>
+                          {/* <Heading size="md" ml="-1">
                             {assessmentName}
-                          </Heading>
+                          </Heading>  */}
+                          <Input
+                            color="#28a745"
+                            value={assessmentName}
+                            onChangeText={text => setAssesstName(text)}
+                          />
                           <Text
-                            fontSize="xs"
+                            fontSize="md"
                             _light={{
-                              color: '#28a745',
+                              color: 'gray.700',
                             }}
                             _dark={{
-                              color: '#28a745',
+                              color: 'gray.700',
                             }}
                             fontWeight="500"
                             ml="-0.5"
                             mt="-1">
-                            {assessmentCommonName}
+                            Common Name:
                           </Text>
+                          <Input
+                            color="gray.500"
+                            value={assessmentCommonName}
+                            onChangeText={text => setAssesstName(text)}
+                          />
                         </Stack>
                         <Box
                           mb={5}
@@ -528,16 +539,6 @@ export default function HealthAssessmentScreen() {
                             mt="-1">
                             Description:
                           </Text>
-                          {/* <ScrollView
-                            nestedScrollEnabled={true}
-                            w={['100%', '300']}
-                            style={{
-                              borderColor: 'black',
-                              borderBottomWidth: 1,
-                              borderStyle: 'dashed',
-                            }}>
-                            <Text fontWeight="400">{assessmentDesc}</Text>
-                          </ScrollView> */}
                           <TextArea
                             value={assessmentDesc}
                             onChangeText={text => setAssessmentDesc(text)}
@@ -595,7 +596,6 @@ export default function HealthAssessmentScreen() {
                                   setAssessmentBiological(text)
                                 }
                                 h={20}
-                                placeholder="Enter Biological.."
                               />
                             </Box>
                           </HStack>

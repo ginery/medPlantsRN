@@ -167,7 +167,9 @@ export default function PlantsScreen() {
                   setPlantAuthority(
                     data.suggestions[0].plant_details.name_authority,
                   );
-                  setPlantSynonyms(data.suggestions[0].plant_details.synonyms);
+                  setPlantSynonyms(
+                    data.suggestions[0].plant_details.synonyms[0],
+                  );
                   setPlantDesc(
                     data.suggestions[0].plant_details.wiki_description.value,
                   );
