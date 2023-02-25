@@ -70,6 +70,7 @@ export default function HealthAssessmentScreen() {
   const [assessmentBiological, setAssessmentBiological] = React.useState('N/A');
   const [assessmentPrevention, setAssessmentPrevention] = React.useState('N/A');
   const [curableDiseases, setCurableDiseases] = React.useState('');
+  const [assessmentExist, setAssessmentExist] = React.useState(false);
   React.useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
       //console.log('refreshed_home');
@@ -88,6 +89,39 @@ export default function HealthAssessmentScreen() {
     },
     [0.4],
   );
+  function scanAssessmentID(entity_id) {
+    const formData = new FormData();
+    formData.append('entity_id', entity_id);
+    fetch(window.name + 'scanAssessment.php', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'multipart/form-data',
+      },
+      body: formData,
+    })
+      .then(response => response.json())
+      .then(responseJson => {
+        console.log(responseJson);
+        var data = responseJson.array_data[0];
+        if (responseJson.array_data != '') {
+          setAssessmentScanId(data.entity_id);
+          setAssesstName(data.assessment_name);
+          setAssessmentDesc(dataassessment_description);
+          setCommonName(data.assessment_common_name);
+          setAssessmentBiological(data.assessment_biological);
+          setAssessmentPrevention(data.assessment_prevention);
+          setAssessmentExist(true);
+        } else {
+          setAssessmentExist(false);
+        }
+      })
+      .catch(error => {
+        setModalVisible(false);
+        console.error(error);
+        Alert.alert('Internet Connection Error');
+      });
+  }
   const photoCapture = async () => {
     try {
       setModalVisible(true);
@@ -97,7 +131,7 @@ export default function HealthAssessmentScreen() {
         .then(base64files => {
           setPhotoBase64('data:image/jpeg;base64,' + base64files);
           const dataToScan = {
-            api_key: 'eqrx10kK3Oz53iDgiZytx1q71pr6Mk1hnbIZCFuZIECchVuW0D',
+            api_key: 'W4h32XMclIrz3b5dbzHTGazTVXzW2qGicQ4ZpWm5ibif1QETf2',
             images: ['data:image/jpeg;base64,' + base64files],
             modifiers: ['crops_fast', 'similar_images'],
             language: 'en',
@@ -122,31 +156,35 @@ export default function HealthAssessmentScreen() {
             .then(data => {
               setModalVisible(false);
               if (data.health_assessment.is_healthy == false) {
-                setAssessmentScanId(data.id);
-                setAssesstName(data.health_assessment.diseases[0].name);
-                setAssessmentDesc(
-                  data.health_assessment.diseases[0].disease_details
-                    .description,
-                );
-                setCommonName(
-                  data.health_assessment.diseases[0].disease_details
-                    .common_names,
-                );
-                setAssessmentBiological(
-                  data.health_assessment.diseases[0].disease_details.treatment
-                    .biological,
-                );
-                setAssessmentPrevention(
-                  data.health_assessment.diseases[0].disease_details.treatment
-                    .prevention,
-                );
+                scanAssessmentID(data.id);
+                if (assessmentExist == false) {
+                  setAssessmentScanId(data.id);
+                  setAssesstName(data.health_assessment.diseases[0].name);
+                  setAssessmentDesc(
+                    data.health_assessment.diseases[0].disease_details
+                      .description,
+                  );
+                  setCommonName(
+                    data.health_assessment.diseases[0].disease_details
+                      .common_names,
+                  );
+                  setAssessmentBiological(
+                    data.health_assessment.diseases[0].disease_details.treatment
+                      .biological,
+                  );
+                  setAssessmentPrevention(
+                    data.health_assessment.diseases[0].disease_details.treatment
+                      .prevention,
+                  );
+                }
+
                 setAssessmentPhoto(photo.path);
                 setModalPlantsDescription(true);
               } else {
                 Alert.alert('This plant is healthy!');
               }
 
-              console.log(data.health_assessment.diseases[0].disease_details);
+              // console.log(data.health_assessment.diseases);
             });
         })
         .catch(err => {
@@ -190,7 +228,9 @@ export default function HealthAssessmentScreen() {
             render: () => {
               return (
                 <Box bg="emerald.500" px="2" py="1" rounded="sm" mb={5}>
-                  <Text color="white">Great! Successfully added Plants.</Text>
+                  <Text color="white">
+                    Great! Successfully added assessment.
+                  </Text>
                 </Box>
               );
             },
@@ -218,7 +258,67 @@ export default function HealthAssessmentScreen() {
         Alert.alert('Internet Connection Error');
       });
   };
+  const updateAssessment = () => {
+    setModalVisible(true);
 
+    const formData = new FormData();
+    formData.append('assessmentScanId', assessmentScanId);
+    formData.append('assessmentName', assessmentName);
+    formData.append('assessmentCommonName', assessmentCommonName);
+    formData.append('assessmentDesc', assessmentDesc);
+    formData.append('assessmentBiological', assessmentBiological);
+    formData.append('assessmentPrevention', assessmentPrevention);
+    formData.append('curableDiseases', curableDiseases);
+
+    fetch(window.name + 'updateAssessment.php', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'multipart/form-data',
+      },
+      body: formData,
+    })
+      .then(response => response.json())
+      .then(responseJson => {
+        var data = responseJson.array_data[0];
+        console.log(data);
+        if (data.res == 1) {
+          setModalVisible(false);
+          setModalPlantsDescription(false);
+          toast.show({
+            render: () => {
+              return (
+                <Box bg="emerald.500" px="2" py="1" rounded="sm" mb={5}>
+                  <Text color="white">
+                    Great! Successfully updated the assessment.
+                  </Text>
+                </Box>
+              );
+            },
+          });
+        } else if (data.res == 2) {
+          setModalVisible(false);
+          // setModalPlantsDescription(false);
+          toast.show({
+            render: () => {
+              return (
+                <Box bg="warning.500" px="2" py="1" rounded="sm" mb={5}>
+                  <Text color="white">Assessment already exist.</Text>
+                </Box>
+              );
+            },
+          });
+        } else {
+          setModalVisible(false);
+          Alert.alert('Something went wrong.');
+        }
+      })
+      .catch(error => {
+        setModalVisible(false);
+        console.error(error);
+        Alert.alert('Internet Connection Error');
+      });
+  };
   return (
     <NativeBaseProvider>
       <HStack
@@ -242,7 +342,7 @@ export default function HealthAssessmentScreen() {
 
       <Center flex={1} px="3" pt="3">
         <Heading>Health Assessment</Heading>
-        <Box alignItems="center">
+        <Box alignItems="center" width="100%">
           {/* <Camera
             style={{width: 500, height: 200}}
             device={device}
@@ -258,37 +358,44 @@ export default function HealthAssessmentScreen() {
               photo={isFocused}
             />
           ) : null}
-          <Center mt={10}>
-            <HStack>
-              <Button
+          <Center mt={10} width="100%">
+            <HStack width="100%" space={2}>
+              <TouchableOpacity
                 onPress={() => {
                   photoCapture();
+                }}
+                style={{
+                  width: '49%',
+                  height: 70,
                 }}>
-                <HStack>
-                  <Icon
-                    as={<FontIcon name="camera" />}
-                    size="5"
-                    color="white"
-                  />
-                  <Text color="white" fontWeight="bold">
-                    {'  '}
-                    SCAN
-                  </Text>
-                </HStack>
-              </Button>
-              <Button
-                ml="1"
+                <Center bg="#28a745" width="100%" height="100%">
+                  <HStack alignContent="center" alignItems="center">
+                    <FontIcon name="camera" size={20} color="white" />
+                    <Text fontSize="lg" color="white">
+                      {' '}
+                      SCAN
+                    </Text>
+                  </HStack>
+                </Center>
+              </TouchableOpacity>
+              <TouchableOpacity
                 onPress={() => {
                   navigation.navigate('Health Assessment List');
+                }}
+                style={{
+                  width: '49%',
+                  height: 70,
                 }}>
-                <HStack>
-                  <Icon as={<FontIcon name="list" />} size="5" color="white" />
-                  <Text color="white" fontWeight="bold">
-                    {'  '}
-                    View List
-                  </Text>
-                </HStack>
-              </Button>
+                <Center bg="#28a745" width="100%" height="100%">
+                  <HStack alignContent="center" alignItems="center">
+                    <FontIcon name="list" size={20} color="white" />
+                    <Text fontSize="lg" color="white">
+                      {' '}
+                      View List
+                    </Text>
+                  </HStack>
+                </Center>
+              </TouchableOpacity>
             </HStack>
           </Center>
         </Box>
@@ -401,6 +508,7 @@ export default function HealthAssessmentScreen() {
                           </Text>
                         </Stack>
                         <Box
+                          mb={5}
                           width="100%"
                           style={{
                             // borderColor: 'black',
@@ -420,7 +528,7 @@ export default function HealthAssessmentScreen() {
                             mt="-1">
                             Description:
                           </Text>
-                          <ScrollView
+                          {/* <ScrollView
                             nestedScrollEnabled={true}
                             w={['100%', '300']}
                             style={{
@@ -429,9 +537,16 @@ export default function HealthAssessmentScreen() {
                               borderStyle: 'dashed',
                             }}>
                             <Text fontWeight="400">{assessmentDesc}</Text>
-                          </ScrollView>
+                          </ScrollView> */}
+                          <TextArea
+                            value={assessmentDesc}
+                            onChangeText={text => setAssessmentDesc(text)}
+                            h={20}
+                            placeholder="Enter Description.."
+                          />
                         </Box>
                         <HStack
+                          mb={5}
                           width="100%"
                           alignItems="center"
                           space={1}
@@ -457,7 +572,7 @@ export default function HealthAssessmentScreen() {
                                 mt="-1">
                                 Biological:
                               </Text>
-                              <ScrollView
+                              {/* <ScrollView
                                 nestedScrollEnabled={true}
                                 w={['100%', '300']}
                                 style={{
@@ -473,11 +588,20 @@ export default function HealthAssessmentScreen() {
                                   fontWeight="400">
                                   Biological : {assessmentBiological}
                                 </Text>
-                              </ScrollView>
+                              </ScrollView> */}
+                              <TextArea
+                                value={assessmentBiological}
+                                onChangeText={text =>
+                                  setAssessmentBiological(text)
+                                }
+                                h={20}
+                                placeholder="Enter Biological.."
+                              />
                             </Box>
                           </HStack>
                         </HStack>
                         <HStack
+                          mb={5}
                           width="100%"
                           alignItems="center"
                           space={1}
@@ -502,7 +626,7 @@ export default function HealthAssessmentScreen() {
                               mt="-1">
                               Prevention:
                             </Text>
-                            <ScrollView
+                            {/* <ScrollView
                               nestedScrollEnabled={true}
                               w={['100%', '200']}>
                               <Text
@@ -513,7 +637,15 @@ export default function HealthAssessmentScreen() {
                                 fontWeight="400">
                                 Prevention : {assessmentPrevention}
                               </Text>
-                            </ScrollView>
+                            </ScrollView> */}
+                            <TextArea
+                              value={assessmentPrevention}
+                              onChangeText={text =>
+                                setAssessmentPrevention(text)
+                              }
+                              h={20}
+                              placeholder="Enter Prevention.."
+                            />
                           </Box>
                         </HStack>
                         <HStack
@@ -552,14 +684,25 @@ export default function HealthAssessmentScreen() {
                         </HStack>
                       </Stack>
                     </ScrollView>
-                    <Button
-                      bgColor="#257f3a"
-                      bg="#28a745"
-                      onPress={() => {
-                        saveAssessment();
-                      }}>
-                      Save Changes
-                    </Button>
+                    {assessmentExist == true ? (
+                      <Button
+                        bgColor="#257f3a"
+                        bg="#28a745"
+                        onPress={() => {
+                          updateAssessment();
+                        }}>
+                        Save Changes
+                      </Button>
+                    ) : (
+                      <Button
+                        bgColor="#257f3a"
+                        bg="#28a745"
+                        onPress={() => {
+                          saveAssessment();
+                        }}>
+                        Add Assessment
+                      </Button>
+                    )}
                   </Box>
                 </Box>
               </Box>

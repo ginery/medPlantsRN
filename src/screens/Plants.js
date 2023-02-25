@@ -38,6 +38,8 @@ import {
   Stack,
   Pressable,
   Icon,
+  Input,
+  TextArea,
 } from 'native-base';
 
 import Rating from 'react-native-easy-rating';
@@ -73,6 +75,7 @@ export default function PlantsScreen() {
   const [taxonomyOrder, setTaxonomyOrder] = React.useState('N/A');
   const [taxonomyPhylum, setTaxonomyPhylum] = React.useState('N/A');
   const [plantScanId, setPlantScanId] = React.useState(0);
+  const [plantExist, setPlantExist] = React.useState(false);
   React.useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
       //console.log('refreshed_home');
@@ -82,6 +85,48 @@ export default function PlantsScreen() {
 
     return unsubscribe;
   }, [navigation]);
+  function scanPlantID(plantid) {
+    const formData = new FormData();
+    formData.append('plantid', plantid);
+    fetch(window.name + 'updatePlant.php', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'multipart/form-data',
+      },
+      body: formData,
+    })
+      .then(response => response.json())
+      .then(responseJson => {
+        console.log(responseJson);
+        var data = responseJson.array_data[0];
+        if (responseJson.array_data != '') {
+          setPlantScanId(data.suggestions[0].id);
+          setPlantName(data.suggestions[0].plant_name);
+          setPlantAuthority(data.suggestions[0].plant_details.name_authority);
+          setPlantSynonyms(data.suggestions[0].plant_details.synonyms);
+          setPlantDesc(
+            data.suggestions[0].plant_details.wiki_description.value,
+          );
+          setTaxonomyClass(data.suggestions[0].plant_details.taxonomy.class);
+          setTaxonomyFamily(data.suggestions[0].plant_details.taxonomy.family);
+          setTaxonomyGenus(data.suggestions[0].plant_details.taxonomy.genus);
+          setTaxonomyKingdom(
+            data.suggestions[0].plant_details.taxonomy.kingdom,
+          );
+          setTaxonomyOrder(data.suggestions[0].plant_details.taxonomy.order);
+          setTaxonomyPhylum(data.suggestions[0].plant_details.taxonomy.phylum);
+          setPlantExist(true);
+        } else {
+          setPlantExist(false);
+        }
+      })
+      .catch(error => {
+        setModalVisible(false);
+        console.error(error);
+        Alert.alert('Internet Connection Error');
+      });
+  }
   const photoCapture = async () => {
     try {
       setModalVisible(true);
@@ -91,7 +136,7 @@ export default function PlantsScreen() {
         .then(base64files => {
           setPhotoBase64('data:image/jpeg;base64,' + base64files);
           const dataToScan = {
-            api_key: 'eqrx10kK3Oz53iDgiZytx1q71pr6Mk1hnbIZCFuZIECchVuW0D',
+            api_key: 'W4h32XMclIrz3b5dbzHTGazTVXzW2qGicQ4ZpWm5ibif1QETf2',
             images: ['data:image/jpeg;base64,' + base64files],
             modifiers: ['crops_fast', 'similar_images'],
             plant_language: 'en',
@@ -116,33 +161,35 @@ export default function PlantsScreen() {
             .then(data => {
               setModalVisible(false);
               if (data.is_plant == true) {
-                setPlantScanId(data.suggestions[0].id);
-                setPlantName(data.suggestions[0].plant_name);
-                setPlantAuthority(
-                  data.suggestions[0].plant_details.name_authority,
-                );
-                setPlantSynonyms(data.suggestions[0].plant_details.synonyms);
-                setPlantDesc(
-                  data.suggestions[0].plant_details.wiki_description.value,
-                );
-                setTaxonomyClass(
-                  data.suggestions[0].plant_details.taxonomy.class,
-                );
-                setTaxonomyFamily(
-                  data.suggestions[0].plant_details.taxonomy.family,
-                );
-                setTaxonomyGenus(
-                  data.suggestions[0].plant_details.taxonomy.genus,
-                );
-                setTaxonomyKingdom(
-                  data.suggestions[0].plant_details.taxonomy.kingdom,
-                );
-                setTaxonomyOrder(
-                  data.suggestions[0].plant_details.taxonomy.order,
-                );
-                setTaxonomyPhylum(
-                  data.suggestions[0].plant_details.taxonomy.phylum,
-                );
+                if (plantExist == false) {
+                  setPlantScanId(data.suggestions[0].id);
+                  setPlantName(data.suggestions[0].plant_name);
+                  setPlantAuthority(
+                    data.suggestions[0].plant_details.name_authority,
+                  );
+                  setPlantSynonyms(data.suggestions[0].plant_details.synonyms);
+                  setPlantDesc(
+                    data.suggestions[0].plant_details.wiki_description.value,
+                  );
+                  setTaxonomyClass(
+                    data.suggestions[0].plant_details.taxonomy.class,
+                  );
+                  setTaxonomyFamily(
+                    data.suggestions[0].plant_details.taxonomy.family,
+                  );
+                  setTaxonomyGenus(
+                    data.suggestions[0].plant_details.taxonomy.genus,
+                  );
+                  setTaxonomyKingdom(
+                    data.suggestions[0].plant_details.taxonomy.kingdom,
+                  );
+                  setTaxonomyOrder(
+                    data.suggestions[0].plant_details.taxonomy.order,
+                  );
+                  setTaxonomyPhylum(
+                    data.suggestions[0].plant_details.taxonomy.phylum,
+                  );
+                }
                 setPlantPhoto(photo.path);
                 setModalPlantsDescription(true);
               } else {
@@ -222,6 +269,69 @@ export default function PlantsScreen() {
         Alert.alert('Internet Connection Error');
       });
   };
+  const updatePlant = () => {
+    setModalVisible(true);
+    const formData = new FormData();
+    formData.append('plantScanId', plantScanId);
+    formData.append('plantName', plantName);
+    formData.append('plantSynonyms', plantSynonyms);
+    formData.append('plantAuthority', plantAuthority);
+    formData.append('plantDesc', plantDesc);
+    formData.append('taxonomyClass', taxonomyClass);
+    formData.append('taxonomyFamily', taxonomyFamily);
+    formData.append('taxonomyGenus', taxonomyGenus);
+    formData.append('taxonomyKingdom', taxonomyKingdom);
+    formData.append('taxonomyOrder', taxonomyOrder);
+    formData.append('taxonomyPhylum', taxonomyPhylum);
+    fetch(window.name + 'updatePlant.php', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'multipart/form-data',
+      },
+      body: formData,
+    })
+      .then(response => response.json())
+      .then(responseJson => {
+        var data = responseJson.array_data[0];
+        console.log(data);
+        if (data.res == 1) {
+          setModalVisible(false);
+          setModalPlantsDescription(false);
+          toast.show({
+            render: () => {
+              return (
+                <Box bg="emerald.500" px="2" py="1" rounded="sm" mb={5}>
+                  <Text color="white">
+                    Great! Successfully updated the plants.
+                  </Text>
+                </Box>
+              );
+            },
+          });
+        } else if (data.res == 2) {
+          setModalVisible(false);
+          // setModalPlantsDescription(false);
+          toast.show({
+            render: () => {
+              return (
+                <Box bg="warning.500" px="2" py="1" rounded="sm" mb={5}>
+                  <Text color="white">Plant already exist.</Text>
+                </Box>
+              );
+            },
+          });
+        } else {
+          setModalVisible(false);
+          Alert.alert('Something went wrong.');
+        }
+      })
+      .catch(error => {
+        setModalVisible(false);
+        console.error(error);
+        Alert.alert('Internet Connection Error');
+      });
+  };
   return (
     <NativeBaseProvider>
       <HStack
@@ -261,7 +371,7 @@ export default function PlantsScreen() {
             />
           ) : null}
           <Center mt={10}>
-            <HStack>
+            {/* <HStack>
               <Button
                 onPress={() => {
                   photoCapture();
@@ -291,6 +401,44 @@ export default function PlantsScreen() {
                   </Text>
                 </HStack>
               </Button>
+            </HStack> */}
+            <HStack width="100%" space={2}>
+              <TouchableOpacity
+                onPress={() => {
+                  photoCapture();
+                }}
+                style={{
+                  width: '49%',
+                  height: 70,
+                }}>
+                <Center bg="#28a745" width="100%" height="100%">
+                  <HStack alignContent="center" alignItems="center">
+                    <FontIcon name="camera" size={20} color="white" />
+                    <Text fontSize="lg" color="white">
+                      {' '}
+                      SCAN
+                    </Text>
+                  </HStack>
+                </Center>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  navigation.navigate('Plant List');
+                }}
+                style={{
+                  width: '49%',
+                  height: 70,
+                }}>
+                <Center bg="#28a745" width="100%" height="100%">
+                  <HStack alignContent="center" alignItems="center">
+                    <FontIcon name="list" size={20} color="white" />
+                    <Text fontSize="lg" color="white">
+                      {' '}
+                      View List
+                    </Text>
+                  </HStack>
+                </Center>
+              </TouchableOpacity>
             </HStack>
           </Center>
         </Box>
@@ -318,7 +466,7 @@ export default function PlantsScreen() {
         visible={modalPlantsDescription}>
         <Box style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
           <Center bg="#2a2a2ab8" width="100%" height="100%">
-            <Center width="100%" height="50%" borderRadius={5}>
+            <Center width="100%" height="80%" borderRadius={5}>
               <Box alignItems="center" width="90%">
                 <Box alignItems="center">
                   <Box
@@ -371,147 +519,270 @@ export default function PlantsScreen() {
                         </Center>
                       </Pressable>
                     </Box>
-                    <Stack p="4" space={0}>
-                      <Stack space={2}>
-                        <Heading size="md" ml="-1">
-                          {plantName}
-                        </Heading>
-                        <Text
-                          fontSize="xs"
-                          _light={{
-                            color: '#28a745',
-                          }}
-                          _dark={{
-                            color: '#28a745',
-                          }}
-                          fontWeight="500"
-                          ml="-0.5"
-                          mt="-1">
-                          {plantAuthority}
-                        </Text>
-                        <Text
-                          fontSize="xs"
-                          _light={{
-                            color: '#28a745',
-                          }}
-                          _dark={{
-                            color: '#28a745',
-                          }}
-                          fontWeight="500"
-                          ml="-0.5"
-                          mt="-1">
-                          {plantSynonyms}
-                        </Text>
-                      </Stack>
-                      <Box
-                        style={{
-                          // borderColor: 'black',
-                          // borderWidth: 1,
-                          height: 150,
-                        }}>
-                        <ScrollView w={['100%', '300']}>
-                          <Text fontWeight="400">{plantDesc}</Text>
-                        </ScrollView>
-                      </Box>
-                      <HStack
-                        alignItems="center"
-                        space={1}
-                        justifyContent="space-between">
-                        <HStack alignItems="center">
-                          <Text
-                            color="coolGray.600"
-                            _dark={{
-                              color: 'warmGray.200',
-                            }}
-                            fontWeight="400">
-                            Taxonomy Class : {taxonomyClass}
-                          </Text>
-                        </HStack>
-                      </HStack>
-                      <HStack
-                        alignItems="center"
-                        space={1}
-                        justifyContent="space-between">
-                        <HStack alignItems="center">
-                          <Text
-                            color="coolGray.600"
-                            _dark={{
-                              color: 'warmGray.200',
-                            }}
-                            fontWeight="400">
-                            Taxonomy Family : {taxonomyFamily}
-                          </Text>
-                        </HStack>
-                      </HStack>
-                      <HStack
-                        alignItems="center"
-                        space={1}
-                        justifyContent="space-between">
-                        <HStack alignItems="center">
-                          <Text
-                            color="coolGray.600"
-                            _dark={{
-                              color: 'warmGray.200',
-                            }}
-                            fontWeight="400">
-                            Taxonomy Genus : {taxonomyGenus}
-                          </Text>
-                        </HStack>
-                      </HStack>
-                      <HStack
-                        alignItems="center"
-                        space={1}
-                        justifyContent="space-between">
-                        <HStack alignItems="center">
-                          <Text
-                            color="coolGray.600"
-                            _dark={{
-                              color: 'warmGray.200',
-                            }}
-                            fontWeight="400">
-                            Taxonomy Kingdom : {taxonomyKingdom}
-                          </Text>
-                        </HStack>
-                      </HStack>
-                      <HStack
-                        alignItems="center"
-                        space={1}
-                        justifyContent="space-between">
-                        <HStack alignItems="center">
-                          <Text
-                            color="coolGray.600"
-                            _dark={{
-                              color: 'warmGray.200',
-                            }}
-                            fontWeight="400">
-                            Taxonomy Order : {taxonomyOrder}
-                          </Text>
-                        </HStack>
-                      </HStack>
-                      <HStack
-                        alignItems="center"
-                        space={1}
-                        justifyContent="space-between">
-                        <HStack alignItems="center">
-                          <Text
-                            color="coolGray.600"
-                            _dark={{
-                              color: 'warmGray.200',
-                            }}
-                            fontWeight="400">
-                            Taxonomy Phylum : {taxonomyPhylum}
-                          </Text>
-                        </HStack>
-                      </HStack>
-                    </Stack>
-                    <Button
-                      bgColor="#257f3a"
-                      bg="#28a745"
-                      onPress={() => {
-                        savePlant();
+                    <ScrollView
+                      nestedScrollEnabled={true}
+                      w={['100%', '300']}
+                      style={{
+                        borderColor: 'black',
+                        borderBottomWidth: 1,
+                        borderStyle: 'dashed',
                       }}>
-                      Save Changes
-                    </Button>
+                      <Stack p="4" space={0}>
+                        <Stack space={1}>
+                          {/* <Heading size="md" ml="-1">
+                            {plantName}
+                          </Heading> */}
+                          <Input
+                            color="#28a745"
+                            value={plantName}
+                            onChangeText={text => setPlantName(text)}
+                          />
+                          <Text
+                            fontSize="xs"
+                            _light={{
+                              color: 'gray.700',
+                            }}
+                            _dark={{
+                              color: 'gray.700',
+                            }}
+                            fontWeight="500"
+                            ml="-0.5"
+                            mt="-1">
+                            Plant Authority:
+                          </Text>
+                          <Input
+                            value={plantAuthority}
+                            onChangeText={text => setPlantAuthority(text)}
+                          />
+
+                          <HStack
+                            mb={1}
+                            alignItems="center"
+                            justifyContent="space-between">
+                            <Box width="100%">
+                              <Text
+                                fontSize="xs"
+                                _light={{
+                                  color: 'gray.700',
+                                }}
+                                _dark={{
+                                  color: 'gray.700',
+                                }}
+                                fontWeight="500"
+                                ml="-0.5"
+                                mt="-1">
+                                Plant Synonyms:
+                              </Text>
+                              <TextArea
+                                value={plantSynonyms}
+                                onChangeText={text => setPlantSynonyms(text)}
+                                h={20}
+                              />
+                            </Box>
+                          </HStack>
+                        </Stack>
+                        <Box
+                          mb={1}
+                          style={
+                            {
+                              // borderColor: 'black',
+                              // borderWidth: 1,
+                            }
+                          }>
+                          <Text
+                            fontSize="xs"
+                            _light={{
+                              color: 'gray.700',
+                            }}
+                            _dark={{
+                              color: 'gray.700',
+                            }}
+                            fontWeight="500"
+                            ml="-0.5"
+                            mt="-1">
+                            Plant Description:
+                          </Text>
+                          <TextArea
+                            value={plantDesc}
+                            onChangeText={text => setPlantDesc(text)}
+                            h={20}
+                          />
+                        </Box>
+                        <HStack
+                          mb={1}
+                          alignItems="center"
+                          space={1}
+                          justifyContent="space-between">
+                          <Box width="100%">
+                            <Text
+                              fontSize="xs"
+                              _light={{
+                                color: 'gray.700',
+                              }}
+                              _dark={{
+                                color: 'gray.700',
+                              }}
+                              fontWeight="500"
+                              ml="-0.5"
+                              mt="-1">
+                              Taxonomy Class:
+                            </Text>
+                            <Input
+                              value={taxonomyClass}
+                              onChangeText={text => setTaxonomyClass(text)}
+                            />
+                          </Box>
+                        </HStack>
+                        <HStack
+                          mb={1}
+                          alignItems="center"
+                          space={1}
+                          justifyContent="space-between">
+                          <Box width="100%">
+                            <Text
+                              fontSize="xs"
+                              _light={{
+                                color: 'gray.700',
+                              }}
+                              _dark={{
+                                color: 'gray.700',
+                              }}
+                              fontWeight="500"
+                              ml="-0.5"
+                              mt="-1">
+                              Taxonomy Family:
+                            </Text>
+                            <Input
+                              value={taxonomyFamily}
+                              onChangeText={text => setTaxonomyFamily(text)}
+                            />
+                          </Box>
+                        </HStack>
+                        <HStack
+                          mb={1}
+                          alignItems="center"
+                          space={1}
+                          justifyContent="space-between">
+                          <Box width="100%">
+                            <Text
+                              fontSize="xs"
+                              _light={{
+                                color: 'gray.700',
+                              }}
+                              _dark={{
+                                color: 'gray.700',
+                              }}
+                              fontWeight="500"
+                              ml="-0.5"
+                              mt="-1">
+                              Taxonomy Genus:
+                            </Text>
+                            <Input
+                              value={taxonomyGenus}
+                              onChangeText={text => setTaxonomyGenus(text)}
+                            />
+                          </Box>
+                        </HStack>
+                        <HStack
+                          mb={1}
+                          alignItems="center"
+                          space={1}
+                          justifyContent="space-between">
+                          <Box width="100%">
+                            <Text
+                              fontSize="xs"
+                              _light={{
+                                color: 'gray.700',
+                              }}
+                              _dark={{
+                                color: 'gray.700',
+                              }}
+                              fontWeight="500"
+                              ml="-0.5"
+                              mt="-1">
+                              Taxonomy Kingdom:
+                            </Text>
+                            <Input
+                              value={taxonomyKingdom}
+                              onChangeText={text => setTaxonomyKingdom(text)}
+                            />
+                          </Box>
+                        </HStack>
+                        <HStack
+                          mb={1}
+                          alignItems="center"
+                          justifyContent="space-between">
+                          <Box width="100%">
+                            <Text
+                              fontSize="xs"
+                              _light={{
+                                color: 'gray.700',
+                              }}
+                              _dark={{
+                                color: 'gray.700',
+                              }}
+                              fontWeight="500"
+                              ml="-0.5"
+                              mt="-1">
+                              Taxonomy Order:
+                            </Text>
+                            <Input
+                              value={taxonomyOrder}
+                              onChangeText={text => setTaxonomyOrder(text)}
+                            />
+                          </Box>
+                        </HStack>
+                        <HStack
+                          alignItems="center"
+                          space={1}
+                          justifyContent="space-between">
+                          <Box
+                            width="100%"
+                            style={{
+                              // borderColor: 'black',
+                              // borderWidth: 1,
+                              height: 90,
+                            }}>
+                            <Text
+                              fontSize="xs"
+                              _light={{
+                                color: 'gray.700',
+                              }}
+                              _dark={{
+                                color: 'gray.700',
+                              }}
+                              fontWeight="500"
+                              ml="-0.5"
+                              mt="-1">
+                              Taxonomy Phylum:
+                            </Text>
+                            <Input
+                              value={taxonomyPhylum}
+                              onChangeText={text => setTaxonomyPhylum(text)}
+                            />
+                          </Box>
+                        </HStack>
+                      </Stack>
+                    </ScrollView>
+                    {plantExist == true ? (
+                      <Button
+                        bgColor="#257f3a"
+                        bg="#28a745"
+                        onPress={() => {
+                          updatePlant();
+                        }}>
+                        Save Changes
+                      </Button>
+                    ) : (
+                      <Button
+                        bgColor="#257f3a"
+                        bg="#28a745"
+                        onPress={() => {
+                          savePlant();
+                        }}>
+                        Add Plant
+                      </Button>
+                    )}
                   </Box>
                 </Box>
               </Box>
