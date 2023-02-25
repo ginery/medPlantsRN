@@ -62,7 +62,7 @@ export default function HealthAssesmentScreen({navigation}) {
   const [modalPlantsDescription, setModalPlantsDescription] =
     React.useState(false);
   const [assessmentData, setAssessmentData] = React.useState([]);
-
+  const [refreshing, setRefreshing] = React.useState(false);
   const getHealthAssessment = () => {
     // setModalVisible(true);
 
@@ -95,6 +95,14 @@ export default function HealthAssesmentScreen({navigation}) {
         Alert.alert('Internet Connection Error');
       });
   };
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    getHealthAssessment();
+
+    setTimeout(function () {
+      setRefreshing(false);
+    }, 1000);
+  }, []);
   return (
     <NativeBaseProvider>
       <HStack
@@ -175,6 +183,16 @@ export default function HealthAssesmentScreen({navigation}) {
             </Box>
           )}
           keyExtractor={item => item.assessment_id}
+          refreshControl={
+            <RefreshControl
+              title="Pull to refresh"
+              tintColor="#fff"
+              titleColor="#fff"
+              colors={['#28a745']}
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+            />
+          }
         />
       </Box>
 

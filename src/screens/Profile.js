@@ -100,7 +100,7 @@ export default function Profile({navigation}) {
               <Center alignSelf="center" position="absolute" bottom="0" pb="3">
                 <Avatar
                   style={{
-                    borderColor: 'white',
+                    borderColor: '#28a745',
                     borderWidth: 4,
                   }}
                   w="100"

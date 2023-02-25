@@ -38,6 +38,7 @@ import {
   Stack,
   Pressable,
   Icon,
+  TextArea,
 } from 'native-base';
 
 import Rating from 'react-native-easy-rating';
@@ -68,7 +69,7 @@ export default function HealthAssessmentScreen() {
   const [assessmentPhoto, setAssessmentPhoto] = React.useState('');
   const [assessmentBiological, setAssessmentBiological] = React.useState('N/A');
   const [assessmentPrevention, setAssessmentPrevention] = React.useState('N/A');
-
+  const [curableDiseases, setCurableDiseases] = React.useState('');
   React.useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
       //console.log('refreshed_home');
@@ -142,7 +143,7 @@ export default function HealthAssessmentScreen() {
                 setAssessmentPhoto(photo.path);
                 setModalPlantsDescription(true);
               } else {
-                Alert.alert('This plant is health!.');
+                Alert.alert('This plant is healthy!');
               }
 
               console.log(data.health_assessment.diseases[0].disease_details);
@@ -168,6 +169,8 @@ export default function HealthAssessmentScreen() {
     formData.append('assessmentPhoto', photoBase64);
     formData.append('assessmentBiological', assessmentBiological);
     formData.append('assessmentPrevention', assessmentPrevention);
+    formData.append('curableDiseases', curableDiseases);
+
     fetch(window.name + 'addAssessment.php', {
       method: 'POST',
       headers: {
@@ -215,6 +218,7 @@ export default function HealthAssessmentScreen() {
         Alert.alert('Internet Connection Error');
       });
   };
+
   return (
     <NativeBaseProvider>
       <HStack
@@ -312,7 +316,7 @@ export default function HealthAssessmentScreen() {
         visible={modalPlantsDescription}>
         <Box style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
           <Center bg="#2a2a2ab8" width="100%" height="100%">
-            <Center width="100%" height="50%" borderRadius={5}>
+            <Center width="100%" height="80%" borderRadius={5}>
               <Box alignItems="center" width="90%">
                 <Box alignItems="center">
                   <Box
@@ -365,94 +369,189 @@ export default function HealthAssessmentScreen() {
                         </Center>
                       </Pressable>
                     </Box>
-                    <Stack p="4" space={0}>
-                      <Stack space={2}>
-                        <Heading size="md" ml="-1">
-                          {assessmentName}
-                        </Heading>
-                        <Text
-                          fontSize="xs"
-                          _light={{
-                            color: '#28a745',
-                          }}
-                          _dark={{
-                            color: '#28a745',
-                          }}
-                          fontWeight="500"
-                          ml="-0.5"
-                          mt="-1">
-                          {assessmentCommonName}
-                        </Text>
-                      </Stack>
-                      <Box
-                        style={{
-                          // borderColor: 'black',
-                          // borderWidth: 1,
-                          height: 90,
-                        }}>
-                        <ScrollView
-                          w={['100%', '300']}
+                    <ScrollView
+                      nestedScrollEnabled={true}
+                      w={['100%', '300']}
+                      style={{
+                        borderColor: 'black',
+                        borderBottomWidth: 1,
+                        borderStyle: 'dashed',
+                      }}>
+                      <Stack p="4" space={0} width="100%">
+                        <Stack
+                          width="100%"
+                          space={2}
+                          borderBottomWidth={1}
+                          borderColor="#28a745">
+                          <Heading size="md" ml="-1">
+                            {assessmentName}
+                          </Heading>
+                          <Text
+                            fontSize="xs"
+                            _light={{
+                              color: '#28a745',
+                            }}
+                            _dark={{
+                              color: '#28a745',
+                            }}
+                            fontWeight="500"
+                            ml="-0.5"
+                            mt="-1">
+                            {assessmentCommonName}
+                          </Text>
+                        </Stack>
+                        <Box
+                          width="100%"
                           style={{
-                            borderColor: 'black',
-                            borderBottomWidth: 1,
-                            borderStyle: 'dashed',
+                            // borderColor: 'black',
+                            // borderWidth: 1,
+                            height: 90,
                           }}>
-                          <Text fontWeight="400">{assessmentDesc}</Text>
-                        </ScrollView>
-                      </Box>
-                      <HStack
-                        alignItems="center"
-                        space={1}
-                        justifyContent="space-between">
-                        <HStack alignItems="center">
+                          <Text
+                            fontSize="md"
+                            _light={{
+                              color: 'gray.700',
+                            }}
+                            _dark={{
+                              color: 'gray.700',
+                            }}
+                            fontWeight="500"
+                            ml="-0.5"
+                            mt="-1">
+                            Description:
+                          </Text>
+                          <ScrollView
+                            nestedScrollEnabled={true}
+                            w={['100%', '300']}
+                            style={{
+                              borderColor: 'black',
+                              borderBottomWidth: 1,
+                              borderStyle: 'dashed',
+                            }}>
+                            <Text fontWeight="400">{assessmentDesc}</Text>
+                          </ScrollView>
+                        </Box>
+                        <HStack
+                          width="100%"
+                          alignItems="center"
+                          space={1}
+                          justifyContent="space-between">
+                          <HStack alignItems="center">
+                            <Box
+                              width="100%"
+                              style={{
+                                // borderColor: 'black',
+                                // borderWidth: 1,
+                                height: 90,
+                              }}>
+                              <Text
+                                fontSize="md"
+                                _light={{
+                                  color: 'gray.700',
+                                }}
+                                _dark={{
+                                  color: 'gray.700',
+                                }}
+                                fontWeight="500"
+                                ml="-0.5"
+                                mt="-1">
+                                Biological:
+                              </Text>
+                              <ScrollView
+                                nestedScrollEnabled={true}
+                                w={['100%', '300']}
+                                style={{
+                                  borderColor: 'black',
+                                  borderBottomWidth: 1,
+                                  borderStyle: 'dashed',
+                                }}>
+                                <Text
+                                  color="coolGray.600"
+                                  _dark={{
+                                    color: 'warmGray.200',
+                                  }}
+                                  fontWeight="400">
+                                  Biological : {assessmentBiological}
+                                </Text>
+                              </ScrollView>
+                            </Box>
+                          </HStack>
+                        </HStack>
+                        <HStack
+                          width="100%"
+                          alignItems="center"
+                          space={1}
+                          justifyContent="space-between">
                           <Box
+                            width="100%"
                             style={{
                               // borderColor: 'black',
                               // borderWidth: 1,
                               height: 90,
                             }}>
+                            <Text
+                              fontSize="md"
+                              _light={{
+                                color: 'gray.700',
+                              }}
+                              _dark={{
+                                color: 'gray.700',
+                              }}
+                              fontWeight="500"
+                              ml="-0.5"
+                              mt="-1">
+                              Prevention:
+                            </Text>
                             <ScrollView
-                              w={['100%', '300']}
-                              style={{
-                                borderColor: 'black',
-                                borderBottomWidth: 1,
-                                borderStyle: 'dashed',
-                              }}>
+                              nestedScrollEnabled={true}
+                              w={['100%', '200']}>
                               <Text
                                 color="coolGray.600"
                                 _dark={{
                                   color: 'warmGray.200',
                                 }}
                                 fontWeight="400">
-                                Biological : {assessmentBiological}
+                                Prevention : {assessmentPrevention}
                               </Text>
                             </ScrollView>
                           </Box>
                         </HStack>
-                      </HStack>
-                      <HStack
-                        alignItems="center"
-                        space={1}
-                        justifyContent="space-between">
-                        <Box
-                          style={{
-                            // borderColor: 'black',
-                            // borderWidth: 1,
-                            height: 90,
-                          }}>
-                          <ScrollView w={['100%', '200']}>
+                        <HStack
+                          width="100%"
+                          alignItems="center"
+                          space={1}
+                          justifyContent="space-between">
+                          <Box
+                            width="100%"
+                            style={{
+                              // borderColor: 'black',
+                              // borderWidth: 1,
+                              height: 90,
+                            }}>
                             <Text
-                              color="coolGray.600"
-                              _dark={{
-                                color: 'warmGray.200',
+                              fontSize="md"
+                              _light={{
+                                color: 'gray.700',
                               }}
-                              fontWeight="400">
-                              Prevention : {assessmentPrevention}
+                              _dark={{
+                                color: 'gray.700',
+                              }}
+                              fontWeight="500"
+                              ml="-0.5"
+                              mt="-1">
+                              Curable Diseases:
                             </Text>
-                          </ScrollView>
-                        </Box>
-                      </HStack>
-                    </Stack>
+                            <Box alignItems="center" w="100%">
+                              <TextArea
+                                onChangeText={text => setCurableDiseases(text)}
+                                h={20}
+                                placeholder="Enter diseases.."
+                              />
+                            </Box>
+                          </Box>
+                        </HStack>
+                      </Stack>
+                    </ScrollView>
                     <Button
                       bgColor="#257f3a"
                       bg="#28a745"

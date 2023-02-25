@@ -12,11 +12,11 @@ import {PermissionsAndroid} from 'react-native';
 import Geolocation from 'react-native-geolocation-service';
 
 // local connection
-window.name = 'http://192.168.87.94/medplant/mobile/';
-global.global_image = 'http://192.168.87.94/medplant/vendors/';
+// window.name = 'http://192.168.154.94/medplant/mobile/';
+// global.global_image = 'http://192.168.154.94/medplant/vendors/';
 // online connection
-// window.name = 'https://juancoder.com/medplants/mobile/';
-// global.global_image = 'https://juancoder.com/medplants/vendors/';
+window.name = 'https://juancoder.com/medplants/mobile/';
+global.global_image = 'https://juancoder.com/medplants/vendors/';
 
 export default function App() {
   React.useEffect(() => {
