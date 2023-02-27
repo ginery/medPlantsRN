@@ -134,7 +134,7 @@ export default function PlantsScreen() {
         .then(base64files => {
           setPhotoBase64('data:image/jpeg;base64,' + base64files);
           const dataToScan = {
-            api_key: 'W4h32XMclIrz3b5dbzHTGazTVXzW2qGicQ4ZpWm5ibif1QETf2',
+            api_key: '4DL1S4fe6BCYhUm7TnZPe9gFBXGaWBm3JLXu3DNtGAaQlA6ZT8',
             images: ['data:image/jpeg;base64,' + base64files],
             modifiers: ['crops_fast', 'similar_images'],
             plant_language: 'en',
