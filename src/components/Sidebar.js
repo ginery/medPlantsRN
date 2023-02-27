@@ -91,12 +91,20 @@ export default function Sidebar({...props}) {
           icon={() => <Icon name="seedling" size={22} color="#257f3a" />}
         />
         <DrawerItem
+          label="Curable Diseases"
+          onPress={() => {
+            props.navigation.navigate('Curable Diseases');
+          }}
+          // inactiveTintColor="#257f3a"
+          icon={() => <Icon name="ambulance" size={22} color="#257f3a" />}
+        />
+        <DrawerItem
           label="Profile"
           onPress={() => {
             props.navigation.navigate('Profile');
           }}
           // inactiveTintColor="#257f3a"
-          icon={() => <Icon name="user" size={22} color="#257f3a" />}
+          icon={() => <Icon name="user-alt" size={22} color="#257f3a" />}
         />
         <DrawerItem
           label="Sign Out"

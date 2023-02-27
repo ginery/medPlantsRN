@@ -53,6 +53,7 @@ export default function PlantListScreen({navigation}) {
   React.useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
       //console.log('refreshed_home');
+
       getHealthAssessment();
     });
 
@@ -64,8 +65,7 @@ export default function PlantListScreen({navigation}) {
   const [assessmentData, setAssessmentData] = React.useState([]);
   const [refreshing, setRefreshing] = React.useState(false);
   const getHealthAssessment = () => {
-    // setModalVisible(true);
-
+    setModalVisible(true);
     fetch(window.name + 'getPlants.php', {
       method: 'GET',
       header: {
@@ -86,6 +86,8 @@ export default function PlantListScreen({navigation}) {
               date_added: item.date_added,
             };
           });
+
+          setModalVisible(false);
           setAssessmentData(data);
         }
       })
@@ -151,7 +153,7 @@ export default function PlantListScreen({navigation}) {
                     uri: global.global_image + 'file/' + item.plant_img,
                   }}
                 />
-                <VStack>
+                <VStack width={150}>
                   <Text
                     _dark={{
                       color: '#28a745',
@@ -202,9 +204,9 @@ export default function PlantListScreen({navigation}) {
         transparent={true}
         visible={modalVisible}>
         <Box style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-          <Center bg="#2a2a2ab8" width="50%" height="20%" borderRadius={10}>
+          <Center bg="#28a7458c" width="100%" height="100%" borderRadius={10}>
             <ActivityIndicator size="large" color="white" />
-            <Text color="white">Scanning....</Text>
+            <Text color="white">Loading data....</Text>
           </Center>
         </Box>
       </Modal>

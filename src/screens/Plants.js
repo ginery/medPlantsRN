@@ -76,6 +76,7 @@ export default function PlantsScreen() {
   const [taxonomyPhylum, setTaxonomyPhylum] = React.useState('N/A');
   const [plantScanId, setPlantScanId] = React.useState(0);
   const [plantExist, setPlantExist] = React.useState(false);
+  const [curableDiseases, setCurableDiseases] = React.useState('');
   React.useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
       //console.log('refreshed_home');
@@ -85,10 +86,10 @@ export default function PlantsScreen() {
 
     return unsubscribe;
   }, [navigation]);
-  function scanPlantID(plantid) {
+  function scanPlantID(plant_name) {
     const formData = new FormData();
-    formData.append('plantid', plantid);
-    fetch(window.name + 'updatePlant.php', {
+    formData.append('plant_name', plant_name);
+    fetch(window.name + 'scanPlant.php', {
       method: 'POST',
       headers: {
         Accept: 'application/json',
@@ -98,24 +99,21 @@ export default function PlantsScreen() {
     })
       .then(response => response.json())
       .then(responseJson => {
-        console.log(responseJson);
+        // console.log(responseJson);
         var data = responseJson.array_data[0];
         if (responseJson.array_data != '') {
-          setPlantScanId(data.suggestions[0].id);
-          setPlantName(data.suggestions[0].plant_name);
-          setPlantAuthority(data.suggestions[0].plant_details.name_authority);
-          setPlantSynonyms(data.suggestions[0].plant_details.synonyms);
-          setPlantDesc(
-            data.suggestions[0].plant_details.wiki_description.value,
-          );
-          setTaxonomyClass(data.suggestions[0].plant_details.taxonomy.class);
-          setTaxonomyFamily(data.suggestions[0].plant_details.taxonomy.family);
-          setTaxonomyGenus(data.suggestions[0].plant_details.taxonomy.genus);
-          setTaxonomyKingdom(
-            data.suggestions[0].plant_details.taxonomy.kingdom,
-          );
-          setTaxonomyOrder(data.suggestions[0].plant_details.taxonomy.order);
-          setTaxonomyPhylum(data.suggestions[0].plant_details.taxonomy.phylum);
+          setPlantScanId(data.plant_id);
+          setPlantName(data.plant_name);
+          setPlantAuthority(data.plant_name_authority);
+          setPlantSynonyms(data.plant_synonyms);
+          setPlantDesc(data.plant_description);
+          setTaxonomyClass(data.plant_taxonomy_class);
+          setTaxonomyFamily(data.plant_taxonomy_family);
+          setTaxonomyGenus(data.plant_taxonomy_genus);
+          setTaxonomyKingdom(data.plant_taxonomy_kingdom);
+          setTaxonomyOrder(data.plant_taxonomy_order);
+          setTaxonomyPhylum(data.plant_taxonomy_phylum);
+          setCurableDiseases(data.curable_diseases);
           setPlantExist(true);
         } else {
           setPlantExist(false);
@@ -161,6 +159,7 @@ export default function PlantsScreen() {
             .then(data => {
               setModalVisible(false);
               if (data.is_plant == true) {
+                scanPlantID(data.suggestions[0].plant_name);
                 if (plantExist == false) {
                   setPlantScanId(data.suggestions[0].id);
                   setPlantName(data.suggestions[0].plant_name);
@@ -192,6 +191,7 @@ export default function PlantsScreen() {
                     data.suggestions[0].plant_details.taxonomy.phylum,
                   );
                 }
+                console.log(data.suggestions[0].plant_details.synonyms);
                 setPlantPhoto(photo.path);
                 setModalPlantsDescription(true);
               } else {
@@ -224,6 +224,7 @@ export default function PlantsScreen() {
     formData.append('taxonomyKingdom', taxonomyKingdom);
     formData.append('taxonomyOrder', taxonomyOrder);
     formData.append('taxonomyPhylum', taxonomyPhylum);
+    formData.append('curableDiseases', curableDiseases);
     fetch(window.name + 'addPlant.php', {
       method: 'POST',
       headers: {
@@ -285,6 +286,7 @@ export default function PlantsScreen() {
     formData.append('taxonomyKingdom', taxonomyKingdom);
     formData.append('taxonomyOrder', taxonomyOrder);
     formData.append('taxonomyPhylum', taxonomyPhylum);
+    formData.append('curableDiseases', curableDiseases);
     fetch(window.name + 'updatePlant.php', {
       method: 'POST',
       headers: {
@@ -453,7 +455,7 @@ export default function PlantsScreen() {
         transparent={true}
         visible={modalVisible}>
         <Box style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-          <Center bg="#2a2a2ab8" width="50%" height="20%" borderRadius={10}>
+          <Center bg="#28a7458c" width="50%" height="20%" borderRadius={10}>
             <ActivityIndicator size="large" color="white" />
             <Text color="white">Scanning....</Text>
           </Center>
@@ -761,6 +763,31 @@ export default function PlantsScreen() {
                             <Input
                               value={taxonomyPhylum}
                               onChangeText={text => setTaxonomyPhylum(text)}
+                            />
+                          </Box>
+                        </HStack>
+                        <HStack
+                          mb={1}
+                          alignItems="center"
+                          justifyContent="space-between">
+                          <Box width="100%">
+                            <Text
+                              fontSize="xs"
+                              _light={{
+                                color: 'gray.700',
+                              }}
+                              _dark={{
+                                color: 'gray.700',
+                              }}
+                              fontWeight="500"
+                              ml="-0.5"
+                              mt="-1">
+                              Curable Diseases/Ailment:
+                            </Text>
+                            <TextArea
+                              value={curableDiseases}
+                              onChangeText={text => setCurableDiseases(text)}
+                              h={20}
                             />
                           </Box>
                         </HStack>

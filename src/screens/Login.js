@@ -27,6 +27,7 @@ import {
   Alert,
   ImageBackground,
   PermissionsAndroid,
+  ToastAndroid,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
@@ -128,15 +129,20 @@ export default function App({navigation, route}) {
   const login = () => {
     setButtonStatus(true);
     if (username == '' || password == '') {
-      toast.show({
-        render: () => {
-          return (
-            <Box bg="error.500" px="2" py="1" rounded="sm" mb={5}>
-              <Text color="white">Opps! Please fill out all text field.</Text>
-            </Box>
-          );
-        },
-      });
+      // toast.show({
+      //   render: () => {
+      //     return (
+      //       <Box bg="error.500" px="2" py="1" rounded="sm" mb={5}>
+      //         <Text color="white">Opps! Please fill out all text field.</Text>
+      //       </Box>
+      //     );
+      //   },
+      // });
+      ToastAndroid.showWithGravity(
+        'Opps! Please fill out all text field.',
+        ToastAndroid.LONG,
+        ToastAndroid.CENTER,
+      );
       setButtonStatus(false);
     } else {
       // Alert.alert(username);

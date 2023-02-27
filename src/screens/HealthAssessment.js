@@ -70,7 +70,6 @@ export default function HealthAssessmentScreen() {
   const [assessmentPhoto, setAssessmentPhoto] = React.useState('');
   const [assessmentBiological, setAssessmentBiological] = React.useState('N/A');
   const [assessmentPrevention, setAssessmentPrevention] = React.useState('N/A');
-  const [curableDiseases, setCurableDiseases] = React.useState('');
   const [assessmentExist, setAssessmentExist] = React.useState(false);
   React.useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
@@ -82,18 +81,10 @@ export default function HealthAssessmentScreen() {
     return unsubscribe;
   }, [navigation]);
 
-  const frameProcessor = useFrameProcessor(
-    frame => {
-      'worklet';
-
-      console.log(frame);
-    },
-    [0.4],
-  );
-  function scanAssessmentID(entity_id) {
-    console.log(entity_id);
+  function scanAssessmentID(assessment_name) {
+    // console.log(entity_id);
     const formData = new FormData();
-    formData.append('entity_id', entity_id);
+    formData.append('assessment_name', assessment_name);
     fetch(window.name + 'scanAssessment.php', {
       method: 'POST',
       headers: {
@@ -104,7 +95,7 @@ export default function HealthAssessmentScreen() {
     })
       .then(response => response.json())
       .then(responseJson => {
-        console.log(responseJson);
+        // console.log(responseJson);
         var data = responseJson.array_data[0];
         if (responseJson.array_data != '') {
           setAssessmentScanId(data.entity_id);
@@ -157,7 +148,7 @@ export default function HealthAssessmentScreen() {
             .then(response => response.json())
             .then(data => {
               setModalVisible(false);
-              scanAssessmentID(data.id);
+              scanAssessmentID(data.health_assessment.diseases[0].name);
               if (data.health_assessment.is_healthy == false) {
                 if (assessmentExist == false) {
                   setAssessmentScanId(data.id);
@@ -179,10 +170,7 @@ export default function HealthAssessmentScreen() {
                       .prevention[0],
                   );
                 }
-                // console.log(
-                //   data.health_assessment.diseases[0].disease_details.treatment
-                //     .biological,
-                // );
+                console.log(data.health_assessment.diseases[0].disease_details);
                 setAssessmentPhoto(photo.path);
                 setModalPlantsDescription(true);
               } else {
@@ -202,8 +190,6 @@ export default function HealthAssessmentScreen() {
   };
   const saveAssessment = () => {
     setModalVisible(true);
-    const uriPart = assessmentPhoto.split('.');
-    const fileExtension = uriPart[uriPart.length - 1];
     const formData = new FormData();
     formData.append('assessmentScanId', assessmentScanId);
     formData.append('assessmentName', assessmentName);
@@ -212,7 +198,6 @@ export default function HealthAssessmentScreen() {
     formData.append('assessmentPhoto', photoBase64);
     formData.append('assessmentBiological', assessmentBiological);
     formData.append('assessmentPrevention', assessmentPrevention);
-    formData.append('curableDiseases', curableDiseases);
 
     fetch(window.name + 'addAssessment.php', {
       method: 'POST',
@@ -273,7 +258,6 @@ export default function HealthAssessmentScreen() {
     formData.append('assessmentDesc', assessmentDesc);
     formData.append('assessmentBiological', assessmentBiological);
     formData.append('assessmentPrevention', assessmentPrevention);
-    formData.append('curableDiseases', curableDiseases);
 
     fetch(window.name + 'updateAssessment.php', {
       method: 'POST',
@@ -346,7 +330,7 @@ export default function HealthAssessmentScreen() {
       </HStack>
 
       <Center flex={1} px="3" pt="3">
-        <Heading>Health Assessment test</Heading>
+        <Heading>Health Assessment</Heading>
         <Box alignItems="center" width="100%">
           {/* <Camera
             style={{width: 500, height: 200}}
@@ -413,7 +397,7 @@ export default function HealthAssessmentScreen() {
         transparent={true}
         visible={modalVisible}>
         <Box style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-          <Center bg="#2a2a2ab8" width="50%" height="20%" borderRadius={10}>
+          <Center bg="#28a7458c" width="50%" height="20%" borderRadius={10}>
             <ActivityIndicator size="large" color="white" />
             <Text color="white">Scanning....</Text>
           </Center>
@@ -646,40 +630,6 @@ export default function HealthAssessmentScreen() {
                               h={20}
                               placeholder="Enter Prevention.."
                             />
-                          </Box>
-                        </HStack>
-                        <HStack
-                          width="100%"
-                          alignItems="center"
-                          space={1}
-                          justifyContent="space-between">
-                          <Box
-                            width="100%"
-                            style={{
-                              // borderColor: 'black',
-                              // borderWidth: 1,
-                              height: 90,
-                            }}>
-                            <Text
-                              fontSize="md"
-                              _light={{
-                                color: 'gray.700',
-                              }}
-                              _dark={{
-                                color: 'gray.700',
-                              }}
-                              fontWeight="500"
-                              ml="-0.5"
-                              mt="-1">
-                              Curable Diseases:
-                            </Text>
-                            <Box alignItems="center" w="100%">
-                              <TextArea
-                                onChangeText={text => setCurableDiseases(text)}
-                                h={20}
-                                placeholder="Enter diseases.."
-                              />
-                            </Box>
                           </Box>
                         </HStack>
                       </Stack>

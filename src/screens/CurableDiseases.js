@@ -51,7 +51,7 @@ import {
   useFrameProcessor,
 } from 'react-native-vision-camera';
 import RNFS from 'react-native-fs';
-export default function CurableDiseasesScreen() {
+export default function PlantsScreen() {
   const isFocused = useIsFocused();
   const camera = React.useRef(null);
   const navigation = useNavigation();
@@ -63,6 +63,19 @@ export default function CurableDiseasesScreen() {
     React.useState(false);
   const [enableCamera, setEnableCamera] = React.useState(false);
   const [plantName, setPlantName] = React.useState('N/A');
+  const [plantAuthority, setPlantAuthority] = React.useState('N/A');
+  const [plantSynonyms, setPlantSynonyms] = React.useState('N/A');
+  const [plantDesc, setPlantDesc] = React.useState('N/A');
+  const [photoBase64, setPhotoBase64] = React.useState('');
+  const [plantPhoto, setPlantPhoto] = React.useState('');
+  const [taxonomyClass, setTaxonomyClass] = React.useState('N/A');
+  const [taxonomyFamily, setTaxonomyFamily] = React.useState('N/A');
+  const [taxonomyGenus, setTaxonomyGenus] = React.useState('N/A');
+  const [taxonomyKingdom, setTaxonomyKingdom] = React.useState('N/A');
+  const [taxonomyOrder, setTaxonomyOrder] = React.useState('N/A');
+  const [taxonomyPhylum, setTaxonomyPhylum] = React.useState('N/A');
+  const [plantScanId, setPlantScanId] = React.useState(0);
+  const [plantExist, setPlantExist] = React.useState(false);
   const [curableDiseases, setCurableDiseases] = React.useState('');
   React.useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
@@ -73,10 +86,10 @@ export default function CurableDiseasesScreen() {
 
     return unsubscribe;
   }, [navigation]);
-  function scanPlantID(plantid) {
+  function scanPlantID(plant_name) {
     const formData = new FormData();
-    formData.append('plantid', plantid);
-    fetch(window.name + 'updatePlant.php', {
+    formData.append('plant_name', plant_name);
+    fetch(window.name + 'scanPlant.php', {
       method: 'POST',
       headers: {
         Accept: 'application/json',
@@ -89,8 +102,18 @@ export default function CurableDiseasesScreen() {
         console.log(responseJson);
         var data = responseJson.array_data[0];
         if (responseJson.array_data != '') {
-          setPlantScanId(data.suggestions[0].id);
-          setPlantName(data.suggestions[0].plant_name);
+          setPlantScanId(data.plant_id);
+          setPlantName(data.plant_name);
+          setPlantAuthority(data.plant_name_authority);
+          setPlantSynonyms(data.plant_synonyms);
+          setPlantDesc(data.plant_description);
+          setTaxonomyClass(data.plant_taxonomy_class);
+          setTaxonomyFamily(data.plant_taxonomy_family);
+          setTaxonomyGenus(data.plant_taxonomy_genus);
+          setTaxonomyKingdom(data.plant_taxonomy_kingdom);
+          setTaxonomyOrder(data.plant_taxonomy_order);
+          setTaxonomyPhylum(data.plant_taxonomy_phylum);
+          setCurableDiseases(data.curable_diseases);
           setPlantExist(true);
         } else {
           setPlantExist(false);
@@ -136,9 +159,37 @@ export default function CurableDiseasesScreen() {
             .then(data => {
               setModalVisible(false);
               if (data.is_plant == true) {
+                scanPlantID(data.suggestions[0].plant_name);
                 if (plantExist == false) {
                   setPlantScanId(data.suggestions[0].id);
                   setPlantName(data.suggestions[0].plant_name);
+                  setPlantAuthority(
+                    data.suggestions[0].plant_details.name_authority,
+                  );
+                  setPlantSynonyms(
+                    data.suggestions[0].plant_details.synonyms[0],
+                  );
+                  setPlantDesc(
+                    data.suggestions[0].plant_details.wiki_description.value,
+                  );
+                  setTaxonomyClass(
+                    data.suggestions[0].plant_details.taxonomy.class,
+                  );
+                  setTaxonomyFamily(
+                    data.suggestions[0].plant_details.taxonomy.family,
+                  );
+                  setTaxonomyGenus(
+                    data.suggestions[0].plant_details.taxonomy.genus,
+                  );
+                  setTaxonomyKingdom(
+                    data.suggestions[0].plant_details.taxonomy.kingdom,
+                  );
+                  setTaxonomyOrder(
+                    data.suggestions[0].plant_details.taxonomy.order,
+                  );
+                  setTaxonomyPhylum(
+                    data.suggestions[0].plant_details.taxonomy.phylum,
+                  );
                 }
                 setPlantPhoto(photo.path);
                 setModalPlantsDescription(true);
@@ -162,7 +213,17 @@ export default function CurableDiseasesScreen() {
     const formData = new FormData();
     formData.append('plantScanId', plantScanId);
     formData.append('plantName', plantName);
-
+    formData.append('plantSynonyms', plantSynonyms);
+    formData.append('plantAuthority', plantAuthority);
+    formData.append('plantDesc', plantDesc);
+    formData.append('plantPhoto', photoBase64);
+    formData.append('taxonomyClass', taxonomyClass);
+    formData.append('taxonomyFamily', taxonomyFamily);
+    formData.append('taxonomyGenus', taxonomyGenus);
+    formData.append('taxonomyKingdom', taxonomyKingdom);
+    formData.append('taxonomyOrder', taxonomyOrder);
+    formData.append('taxonomyPhylum', taxonomyPhylum);
+    formData.append('curableDiseases', curableDiseases);
     fetch(window.name + 'addPlant.php', {
       method: 'POST',
       headers: {
@@ -215,16 +276,8 @@ export default function CurableDiseasesScreen() {
     const formData = new FormData();
     formData.append('plantScanId', plantScanId);
     formData.append('plantName', plantName);
-    formData.append('plantSynonyms', plantSynonyms);
-    formData.append('plantAuthority', plantAuthority);
-    formData.append('plantDesc', plantDesc);
-    formData.append('taxonomyClass', taxonomyClass);
-    formData.append('taxonomyFamily', taxonomyFamily);
-    formData.append('taxonomyGenus', taxonomyGenus);
-    formData.append('taxonomyKingdom', taxonomyKingdom);
-    formData.append('taxonomyOrder', taxonomyOrder);
-    formData.append('taxonomyPhylum', taxonomyPhylum);
-    fetch(window.name + 'updatePlant.php', {
+    formData.append('curableDiseases', curableDiseases);
+    fetch(window.name + 'updateCurableDiseasess.php', {
       method: 'POST',
       headers: {
         Accept: 'application/json',
@@ -312,37 +365,6 @@ export default function CurableDiseasesScreen() {
             />
           ) : null}
           <Center mt={10}>
-            {/* <HStack>
-              <Button
-                onPress={() => {
-                  photoCapture();
-                }}>
-                <HStack>
-                  <Icon
-                    as={<FontIcon name="camera" />}
-                    size="5"
-                    color="white"
-                  />
-                  <Text color="white" fontWeight="bold">
-                    {'  '}
-                    SCAN
-                  </Text>
-                </HStack>
-              </Button>
-              <Button
-                ml="1"
-                onPress={() => {
-                  navigation.navigate('Plant List');
-                }}>
-                <HStack>
-                  <Icon as={<FontIcon name="list" />} size="5" color="white" />
-                  <Text color="white" fontWeight="bold">
-                    {'  '}
-                    View List
-                  </Text>
-                </HStack>
-              </Button>
-            </HStack> */}
             <HStack width="100%" space={2}>
               <TouchableOpacity
                 onPress={() => {
@@ -455,6 +477,7 @@ export default function CurableDiseasesScreen() {
                           {/* <Heading size="md" ml="-1">
                             {plantName}
                           </Heading> */}
+
                           <Text
                             fontSize="xs"
                             _light={{
@@ -466,7 +489,7 @@ export default function CurableDiseasesScreen() {
                             fontWeight="500"
                             ml="-0.5"
                             mt="-1">
-                            Plant Name:
+                            Plant Name
                           </Text>
                           <Input
                             color="#28a745"
@@ -493,8 +516,8 @@ export default function CurableDiseasesScreen() {
                                 Curable Diseases/Ailment:
                               </Text>
                               <TextArea
-                                value={plantSynonyms}
-                                onChangeText={text => setPlantSynonyms(text)}
+                                value={curableDiseases}
+                                onChangeText={text => setCurableDiseases(text)}
                                 h={20}
                               />
                             </Box>

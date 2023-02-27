@@ -41,15 +41,7 @@ export default function Register({navigation}) {
   const [modalVisible, setModalVisible] = React.useState(false);
   const registerUser = () => {
     setModalVisible(true);
-    if (
-      fname == '' ||
-      mname == '' ||
-      lname == '' ||
-      email == '' ||
-      username == '' ||
-      password == '' ||
-      contactNumber == ''
-    ) {
+    if (fname == '' || lname == '' || username == '' || password == '') {
       toast.show({
         render: () => {
           return (
@@ -65,12 +57,9 @@ export default function Register({navigation}) {
     } else {
       const formData = new FormData();
       formData.append('fname', fname);
-      formData.append('mname', mname);
       formData.append('lname', lname);
-      formData.append('email', email);
       formData.append('username', username);
       formData.append('password', password);
-      formData.append('contactNumber', contactNumber);
 
       fetch(window.name + 'register.php', {
         method: 'POST',
@@ -173,7 +162,7 @@ export default function Register({navigation}) {
                     placeholderTextColor="#626262"
                   />
                 </FormControl>
-                <FormControl>
+                {/* <FormControl>
                   <Input
                     variant="outline"
                     placeholder="Middle Name"
@@ -189,7 +178,7 @@ export default function Register({navigation}) {
                     }
                     placeholderTextColor="#626262"
                   />
-                </FormControl>
+                </FormControl> */}
                 <FormControl>
                   <Input
                     variant="outline"
@@ -207,7 +196,7 @@ export default function Register({navigation}) {
                     placeholderTextColor="#626262"
                   />
                 </FormControl>
-                <FormControl>
+                {/* <FormControl>
                   <Input
                     variant="outline"
                     placeholder="Email"
@@ -223,8 +212,8 @@ export default function Register({navigation}) {
                     }
                     placeholderTextColor="#626262"
                   />
-                </FormControl>
-                <FormControl>
+                </FormControl> */}
+                {/* <FormControl>
                   <Input
                     variant="outline"
                     placeholder="Contact #"
@@ -240,7 +229,7 @@ export default function Register({navigation}) {
                     }
                     placeholderTextColor="#626262"
                   />
-                </FormControl>
+                </FormControl> */}
                 <FormControl>
                   <Input
                     variant="outline"

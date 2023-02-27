@@ -64,7 +64,7 @@ export default function HealthAssesmentScreen({navigation}) {
   const [assessmentData, setAssessmentData] = React.useState([]);
   const [refreshing, setRefreshing] = React.useState(false);
   const getHealthAssessment = () => {
-    // setModalVisible(true);
+    setModalVisible(true);
 
     fetch(window.name + 'getAssessment.php', {
       method: 'GET',
@@ -87,6 +87,7 @@ export default function HealthAssesmentScreen({navigation}) {
               date_added: item.date_added,
             };
           });
+          setModalVisible(false);
           setAssessmentData(data);
         }
       })
@@ -152,7 +153,7 @@ export default function HealthAssesmentScreen({navigation}) {
                       global.global_image + 'assessment/' + item.assessment_img,
                   }}
                 />
-                <VStack>
+                <VStack width={150}>
                   <Text
                     _dark={{
                       color: 'warmGray.50',
@@ -204,9 +205,9 @@ export default function HealthAssesmentScreen({navigation}) {
         transparent={true}
         visible={modalVisible}>
         <Box style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-          <Center bg="#2a2a2ab8" width="50%" height="20%" borderRadius={10}>
+          <Center bg="#28a7458c" width="100%" height="100%" borderRadius={10}>
             <ActivityIndicator size="large" color="white" />
-            <Text color="white">Scanning....</Text>
+            <Text color="white">Loading Data....</Text>
           </Center>
         </Box>
       </Modal>
