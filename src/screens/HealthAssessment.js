@@ -346,7 +346,7 @@ export default function HealthAssessmentScreen() {
       </HStack>
 
       <Center flex={1} px="3" pt="3">
-        <Heading>Health Assessment</Heading>
+        <Heading>Health Assessment test</Heading>
         <Box alignItems="center" width="100%">
           {/* <Camera
             style={{width: 500, height: 200}}
