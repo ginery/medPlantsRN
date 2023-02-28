@@ -11,6 +11,8 @@ import HealthAssessmentScreen from '../screens/HealthAssessment';
 import HealthAssessmentListScreen from '../screens/HealthAssessmentList';
 import PlantListScreen from '../screens/PlantsList';
 import CurableDiseasesScreen from '../screens/CurableDiseases';
+import PlantDetailsScreen from '../screens/PlantsDetails';
+import AssessmentDetailsScreen from '../screens/AssessmentDetails';
 const Stack = createStackNavigator();
 const MainStackNavigator = () => {
   return (
@@ -68,6 +70,16 @@ const MainStackNavigator = () => {
       <Stack.Screen
         name="Curable Diseases"
         component={CurableDiseasesScreen}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
+        name="Plants Details"
+        component={PlantDetailsScreen}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
+        name="Assessment Details"
+        component={AssessmentDetailsScreen}
         options={{headerShown: false}}
       />
     </Stack.Navigator>

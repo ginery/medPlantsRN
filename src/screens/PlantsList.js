@@ -133,55 +133,62 @@ export default function PlantListScreen({navigation}) {
           data={assessmentData}
           keyExtractor={item => item.plant_id}
           renderItem={({item}) => (
-            <Box
-              bg="white"
-              shadow={1}
-              borderRadius={5}
-              mb={1}
-              borderWidth="1"
-              _dark={{
-                borderColor: '#28a745',
-              }}
-              borderColor="#28a745"
-              pl={['0', '4']}
-              pr={['0', '5']}
-              py="2">
-              <HStack space={[2, 3]} justifyContent="space-between" p={1}>
-                <Image
-                  size="48px"
-                  source={{
-                    uri: global.global_image + 'file/' + item.plant_img,
-                  }}
-                />
-                <VStack width={150}>
-                  <Text
-                    _dark={{
-                      color: '#28a745',
+            <TouchableOpacity
+              onPress={() => {
+                navigation.navigate('Plants Details', {
+                  plant_id: item.plant_id,
+                });
+              }}>
+              <Box
+                bg="white"
+                borderRadius={5}
+                mb={1}
+                borderWidth="1"
+                _dark={{
+                  borderColor: '#28a745',
+                }}
+                borderColor="#28a745"
+                pl={['0', '4']}
+                pr={['0', '5']}
+                py="2">
+                <HStack space={[2, 3]} justifyContent="space-between" p={1}>
+                  <Image
+                    size="48px"
+                    source={{
+                      uri: global.global_image + 'file/' + item.plant_img,
                     }}
-                    color="#28a745"
-                    bold>
-                    {item.plant_name}
-                  </Text>
+                    alt="Alternate Text"
+                  />
+                  <VStack width={150}>
+                    <Text
+                      _dark={{
+                        color: '#28a745',
+                      }}
+                      color="#28a745"
+                      bold>
+                      {item.plant_name}
+                    </Text>
+                    <Text
+                      color="coolGray.600"
+                      _dark={{
+                        color: 'warmGray.200',
+                      }}>
+                      {item.plant_name_authority}
+                    </Text>
+                  </VStack>
+                  <Spacer />
                   <Text
-                    color="coolGray.600"
+                    fontSize="xs"
                     _dark={{
-                      color: 'warmGray.200',
-                    }}>
-                    {item.plant_name_authority}
+                      color: 'warmGray.50',
+                    }}
+                    color="coolGray.800"
+                    alignSelf="flex-start">
+                    {item.date_added}
                   </Text>
-                </VStack>
-                <Spacer />
-                <Text
-                  fontSize="xs"
-                  _dark={{
-                    color: 'warmGray.50',
-                  }}
-                  color="coolGray.800"
-                  alignSelf="flex-start">
-                  {item.date_added}
-                </Text>
-              </HStack>
-            </Box>
+                </HStack>
+              </Box>
+            </TouchableOpacity>
           )}
           refreshControl={
             <RefreshControl
@@ -204,7 +211,7 @@ export default function PlantListScreen({navigation}) {
         transparent={true}
         visible={modalVisible}>
         <Box style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-          <Center bg="#28a7458c" width="100%" height="100%" borderRadius={10}>
+          <Center bg="#28a7458c" width="100%" height="100%">
             <ActivityIndicator size="large" color="white" />
             <Text color="white">Loading data....</Text>
           </Center>

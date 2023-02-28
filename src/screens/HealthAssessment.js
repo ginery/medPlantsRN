@@ -397,7 +397,7 @@ export default function HealthAssessmentScreen() {
         transparent={true}
         visible={modalVisible}>
         <Box style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-          <Center bg="#28a7458c" width="50%" height="20%" borderRadius={10}>
+          <Center bg="#28a7458c" width="50%" height="20%">
             <ActivityIndicator size="large" color="white" />
             <Text color="white">Scanning....</Text>
           </Center>

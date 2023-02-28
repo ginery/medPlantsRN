@@ -132,56 +132,65 @@ export default function HealthAssesmentScreen({navigation}) {
           w="100%"
           data={assessmentData}
           renderItem={({item}) => (
-            <Box
-              bg="white"
-              shadow={1}
-              borderRadius={5}
-              mb={1}
-              borderWidth="1"
-              _dark={{
-                borderColor: '#28a745',
-              }}
-              borderColor="#28a745"
-              pl={['0', '4']}
-              pr={['0', '5']}
-              py="2">
-              <HStack space={[2, 3]} justifyContent="space-between" p={1}>
-                <Image
-                  size="48px"
-                  source={{
-                    uri:
-                      global.global_image + 'assessment/' + item.assessment_img,
-                  }}
-                />
-                <VStack width={150}>
+            <TouchableOpacity
+              onPress={() => {
+                navigation.navigate('Assessment Details', {
+                  assessment_id: item.assessment_id,
+                });
+              }}>
+              <Box
+                bg="white"
+                borderRadius={5}
+                mb={1}
+                borderWidth="1"
+                _dark={{
+                  borderColor: '#28a745',
+                }}
+                borderColor="#28a745"
+                pl={['0', '4']}
+                pr={['0', '5']}
+                py="2">
+                <HStack space={[2, 3]} justifyContent="space-between" p={1}>
+                  <Image
+                    size="48px"
+                    source={{
+                      uri:
+                        global.global_image +
+                        'assessment/' +
+                        item.assessment_img,
+                    }}
+                    alt="Alternate Text"
+                  />
+                  <VStack width={150}>
+                    <Text
+                      _dark={{
+                        color: 'warmGray.50',
+                      }}
+                      color="coolGray.800"
+                      bold>
+                      {item.assessment_name}
+                    </Text>
+                    <Text
+                      color="coolGray.600"
+                      _dark={{
+                        color: 'warmGray.200',
+                      }}>
+                      {item.assessment_common_name}
+                    </Text>
+                  </VStack>
+                  <Spacer />
                   <Text
+                    fontSize="xs"
                     _dark={{
                       color: 'warmGray.50',
                     }}
                     color="coolGray.800"
-                    bold>
-                    {item.assessment_name}
+                    alignSelf="flex-start">
+                    {item.date_added}
                   </Text>
-                  <Text
-                    color="coolGray.600"
-                    _dark={{
-                      color: 'warmGray.200',
-                    }}>
-                    {item.assessment_common_name}
-                  </Text>
-                </VStack>
-                <Spacer />
-                <Text
-                  fontSize="xs"
-                  _dark={{
-                    color: 'warmGray.50',
-                  }}
-                  color="coolGray.800"
-                  alignSelf="flex-start">
-                  {item.date_added}
-                </Text>
-              </HStack>
-            </Box>
+                </HStack>
+              </Box>
+            </TouchableOpacity>
           )}
           keyExtractor={item => item.assessment_id}
           refreshControl={
@@ -205,7 +214,7 @@ export default function HealthAssesmentScreen({navigation}) {
         transparent={true}
         visible={modalVisible}>
         <Box style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-          <Center bg="#28a7458c" width="100%" height="100%" borderRadius={10}>
+          <Center bg="#28a7458c" width="100%" height="100%">
             <ActivityIndicator size="large" color="white" />
             <Text color="white">Loading Data....</Text>
           </Center>
