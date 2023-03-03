@@ -38,6 +38,7 @@ import {
   Pressable,
   Icon,
   Image,
+  Input,
 } from 'native-base';
 
 import Rating from 'react-native-easy-rating';
@@ -64,6 +65,8 @@ export default function PlantListScreen({navigation}) {
     React.useState(false);
   const [assessmentData, setAssessmentData] = React.useState([]);
   const [refreshing, setRefreshing] = React.useState(false);
+  const [filteredDataSource, setFilteredDataSource] = React.useState([]);
+  const [seachData, setSearchData] = React.useState('');
   const getHealthAssessment = () => {
     setModalVisible(true);
     fetch(window.name + 'getPlants.php', {
@@ -84,10 +87,11 @@ export default function PlantListScreen({navigation}) {
               plant_name_authority: item.plant_name_authority,
               plant_img: item.plant_img,
               date_added: item.date_added,
+              query_data: item.plant_name,
             };
           });
-
           setModalVisible(false);
+          setFilteredDataSource(data);
           setAssessmentData(data);
         }
       })
@@ -104,6 +108,22 @@ export default function PlantListScreen({navigation}) {
       setRefreshing(false);
     }, 1000);
   }, []);
+  const seachFunction = text => {
+    if (text) {
+      const newData = assessmentData.filter(function (item) {
+        const itemData = item.query_data
+          ? item.query_data.toUpperCase()
+          : ''.toUpperCase();
+        const textData = text.toUpperCase();
+        return itemData.indexOf(textData) > -1;
+      });
+      setFilteredDataSource(newData);
+      setSearchData(text);
+    } else {
+      setSearchData(text);
+      setFilteredDataSource(assessmentData);
+    }
+  };
   return (
     <NativeBaseProvider>
       <HStack
@@ -115,22 +135,43 @@ export default function PlantListScreen({navigation}) {
         <HStack space={4} alignItems="center">
           <TouchableOpacity
             onPress={() => {
-              navigation.openDrawer();
+              navigation.goBack();
             }}>
-            <FontIcon name="bars" size={22} color="white" />
+            <FontIcon name="arrow-left" size={22} color="white" />
           </TouchableOpacity>
           <Text color="white" fontSize={20} fontWeight="bold">
-            MedPlants
+            Scan Plants
           </Text>
         </HStack>
       </HStack>
 
       <Heading p="3">Plant List</Heading>
-      <Box p="3" h="85%" w="100%">
+      <VStack w="100%" space={5} alignSelf="center">
+        <Input
+          value={seachData}
+          onChangeText={text => seachFunction(text)}
+          placeholder="Search Plant Name.."
+          variant="filled"
+          width="100%"
+          borderRadius="10"
+          py="1"
+          px="2"
+          bg="white"
+          InputLeftElement={
+            <Icon
+              ml="2"
+              size="4"
+              color="gray.400"
+              as={<FontIcon name="search" />}
+            />
+          }
+        />
+      </VStack>
+      <Box p="3" h="80%" w="100%">
         <FlatList
           h="100%"
           w="100%"
-          data={assessmentData}
+          data={filteredDataSource}
           keyExtractor={item => item.plant_id}
           renderItem={({item}) => (
             <TouchableOpacity

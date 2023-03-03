@@ -38,6 +38,7 @@ import {
   Pressable,
   Icon,
   Image,
+  Input,
 } from 'native-base';
 
 import Rating from 'react-native-easy-rating';
@@ -63,6 +64,8 @@ export default function HealthAssesmentScreen({navigation}) {
     React.useState(false);
   const [assessmentData, setAssessmentData] = React.useState([]);
   const [refreshing, setRefreshing] = React.useState(false);
+  const [seachData, setSearchData] = React.useState('');
+  const [filteredDataSource, setFilteredDataSource] = React.useState([]);
   const getHealthAssessment = () => {
     setModalVisible(true);
 
@@ -85,10 +88,12 @@ export default function HealthAssesmentScreen({navigation}) {
               assessment_common_name: item.assessment_common_name,
               assessment_img: item.assessment_img,
               date_added: item.date_added,
+              query_data: item.assessment_name,
             };
           });
           setModalVisible(false);
           setAssessmentData(data);
+          setFilteredDataSource(data);
         }
       })
       .catch(error => {
@@ -104,6 +109,22 @@ export default function HealthAssesmentScreen({navigation}) {
       setRefreshing(false);
     }, 1000);
   }, []);
+  const seachFunction = text => {
+    if (text) {
+      const newData = assessmentData.filter(function (item) {
+        const itemData = item.query_data
+          ? item.query_data.toUpperCase()
+          : ''.toUpperCase();
+        const textData = text.toUpperCase();
+        return itemData.indexOf(textData) > -1;
+      });
+      setFilteredDataSource(newData);
+      setSearchData(text);
+    } else {
+      setSearchData(text);
+      setFilteredDataSource(assessmentData);
+    }
+  };
   return (
     <NativeBaseProvider>
       <HStack
@@ -117,20 +138,41 @@ export default function HealthAssesmentScreen({navigation}) {
             onPress={() => {
               navigation.openDrawer();
             }}>
-            <FontIcon name="bars" size={22} color="white" />
+            <FontIcon name="arrow-left" size={22} color="white" />
           </TouchableOpacity>
           <Text color="white" fontSize={20} fontWeight="bold">
-            MedPlants
+            Scan Assessment
           </Text>
         </HStack>
       </HStack>
 
       <Heading p="3">Health Assessment List</Heading>
+      <VStack w="100%" space={5} alignSelf="center">
+        <Input
+          value={seachData}
+          onChangeText={text => seachFunction(text)}
+          placeholder="Search"
+          variant="filled"
+          width="100%"
+          borderRadius="10"
+          py="1"
+          px="2"
+          bg="white"
+          InputLeftElement={
+            <Icon
+              ml="2"
+              size="4"
+              color="gray.400"
+              as={<FontIcon name="search" />}
+            />
+          }
+        />
+      </VStack>
       <Box p="3" h="85%" w="100%">
         <FlatList
           h="100%"
           w="100%"
-          data={assessmentData}
+          data={filteredDataSource}
           renderItem={({item}) => (
             <TouchableOpacity
               onPress={() => {
