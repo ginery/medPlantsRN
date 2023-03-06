@@ -195,29 +195,6 @@ export default function HomeScreen() {
                   borderBottomLeftRadius={10}
                   borderTopLeftRadius={10}>
                   <Text bold fontSize={20}>
-                    {countUser}
-                  </Text>
-                  <Text>Users</Text>
-                </Center>
-                <Center
-                  w="20%"
-                  bg="#334148"
-                  borderBottomRightRadius={10}
-                  borderTopRightRadius={10}>
-                  <EntypoIcon name="user" size={25} color="rgb(0, 236, 207)" />
-                </Center>
-              </HStack>
-            </Center>
-            <Center w="100%" h="20" shadow={3}>
-              <HStack justifyContent="center" w="100%" h="100%">
-                <Center
-                  w="80%"
-                  bg="white"
-                  alignItems="flex-start"
-                  pl={3}
-                  borderBottomLeftRadius={10}
-                  borderTopLeftRadius={10}>
-                  <Text bold fontSize={20}>
                     {countPlant}
                   </Text>
                   <Text>Total Plant</Text>
